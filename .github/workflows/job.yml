@@ -17,7 +17,7 @@ jobs:
   build:
     # 固定版本，避免 ubuntu-latest 迁移带来的意外
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@v5
 
@@ -25,7 +25,9 @@ jobs:
         with:
           node-version: '22'
 
+      # 每个源各自重试；某个源失败只记 warning，不阻断其它源，也不让整个任务变红
       - name: run a
+        continue-on-error: true
         run: |
           for i in 1 2 3; do
             if node gen-a.mjs --config config.json; then
@@ -33,9 +35,11 @@ jobs:
             fi
             sleep 300
           done
+          echo "::warning::run a failed"
           exit 1
 
       - name: run c
+        continue-on-error: true
         run: |
           for i in 1 2 3; do
             if node gen-c.mjs --out feed-c.xml --limit 100 --with-content --content-limit 20 \
@@ -45,9 +49,9 @@ jobs:
             fi
             sleep 180
           done
+          echo "::warning::run c failed"
           exit 1
 
-      # 空间接口有风控，失败不影响其它源，也不让整个任务变红
       - name: run d
         continue-on-error: true
         run: |
@@ -56,9 +60,23 @@ jobs:
                  --self "https://cdn.jsdelivr.net/gh/${{ github.repository }}@main/feed-d.xml"; then
               exit 0
             fi
-            sleep 60
+            sleep 120
           done
           echo "::warning::run d failed"
+          exit 1
+
+      - name: run e
+        continue-on-error: true
+        run: |
+          for i in 1 2 3; do
+            if node gen-e.mjs --out feed-e.xml --limit 50 --with-content --content-limit 20 \
+                 --guid-version 1 \
+                 --self "https://cdn.jsdelivr.net/gh/${{ github.repository }}@main/feed-e.xml"; then
+              exit 0
+            fi
+            sleep 60
+          done
+          echo "::warning::run e failed"
           exit 1
 
       - name: check
@@ -78,7 +96,7 @@ jobs:
             git reset --soft FETCH_HEAD
           fi
 
-          git add -A -- '*.xml' '.s-a.json' '.s-c.json'
+          git add -A -- '*.xml' '.s-a.json' '.s-c.json' '.s-e.json'
           if git diff --cached --quiet; then
             echo "no change"
             exit 0
@@ -89,7 +107,7 @@ jobs:
           if ! git push; then
             git fetch origin "${GITHUB_REF_NAME}"
             git reset --soft FETCH_HEAD
-            git add -A -- '*.xml' '.s-a.json' '.s-c.json'
+            git add -A -- '*.xml' '.s-a.json' '.s-c.json' '.s-e.json'
             if git diff --cached --quiet; then
               echo "no change"
               exit 0

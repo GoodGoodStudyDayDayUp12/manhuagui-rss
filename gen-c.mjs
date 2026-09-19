@@ -4,30 +4,31 @@
 
 import https from 'node:https';
 import fs from 'node:fs';
+import {
+  esc,
+  cdata,
+  sleep,
+  sliceDiv,
+  sanitizeContent,
+  SANITIZER_VERSION,
+  textLength,
+  truncateHtml,
+  loadContentCache,
+  saveContentCache,
+  pruneCache,
+  unchangedFile,
+} from './lib.mjs';
 
 const DATA_URL = 'https://www.gov.cn/zhengce/zuixin/ZUIXINZHENGCE.json';
 const PAGE_URL = 'https://www.gov.cn/zhengce/zuixin/';
 const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36';
 
-/* ---------------- 工具 ---------------- */
-const esc = (s) =>
-  String(s ?? '')
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&apos;');
-
-const cdata = (s) => '<![CDATA[' + String(s ?? '').replace(/]]>/g, ']]]]><![CDATA[>') + ']]>';
-
-/** 政府网日期是北京时间，按 +08:00 解析 */
 const parseDate = (d) => {
   if (!d) return null;
   const t = new Date(`${String(d).trim()}T00:00:00+08:00`);
   return Number.isNaN(t.getTime()) ? null : t;
 };
 
-const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 function get(url, depth = 0) {
   return new Promise((resolve, reject) => {
@@ -79,130 +80,6 @@ async function fetchJson(url, retries = 3) {
   throw last;
 }
 
-/* ---------------- 正文抓取 ---------------- */
-const decodeEntities = (s) =>
-  String(s ?? '')
-    .replace(/&#x([0-9a-f]+);/gi, (_, h) => String.fromCodePoint(parseInt(h, 16)))
-    .replace(/&#(\d+);/g, (_, d) => String.fromCodePoint(Number(d)))
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;|&apos;/g, "'")
-    .replace(/&mdash;/g, '—')
-    .replace(/&nbsp;/g, ' ')
-    .replace(/&amp;/g, '&');
-
-const cleanText = (s) => decodeEntities(String(s).replace(/<[^>]+>/g, ' ')).replace(/[ \t\u00a0]+/g, ' ').trim();
-
-/** 从 startIdx（指向 <div）开始按 div 深度截取整个元素 */
-function sliceDiv(html, startIdx) {
-  let depth = 0;
-  let j = startIdx;
-  while (j < html.length) {
-    const o = html.indexOf('<div', j);
-    const c = html.indexOf('</div>', j);
-    if (c === -1) break;
-    if (o !== -1 && o < c) {
-      depth++;
-      j = o + 4;
-    } else {
-      depth--;
-      j = c + 6;
-      if (depth === 0) return html.slice(startIdx, j);
-    }
-  }
-  return html.slice(startIdx);
-}
-
-/** 清洗规则版本：改动清洗逻辑时 +1，缓存里版本不一致会自动重抓，无需手动清缓存 */
-const SANITIZER_VERSION = 2;
-
-/** 清洗正文：只保留基本排版标签（加粗、标题、列表、表格、链接、图片），去掉所有属性里的样式类名 */
-const KEEP_TAGS = new Set([
-  'p', 'br', 'hr', 'strong', 'b', 'em', 'i', 'u', 's', 'sub', 'sup',
-  'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
-  'ul', 'ol', 'li', 'blockquote',
-  'table', 'thead', 'tbody', 'tfoot', 'tr', 'td', 'th',
-  'a', 'img',
-]);
-const VOID_TAGS = new Set(['br', 'hr', 'img']);
-const ATTR_KEEP = { a: ['href'], img: ['src', 'alt'] };
-
-function sanitizeContent(raw) {
-  let s = raw
-    .replace(/<script[\s\S]*?<\/script>/gi, '')
-    .replace(/<style[\s\S]*?<\/style>/gi, '')
-    .replace(/<noscript[\s\S]*?<\/noscript>/gi, '')
-    .replace(/<!--[\s\S]*?-->/g, '')
-    .replace(/<o:p[\s\S]*?<\/o:p>/gi, '');
-
-  // 逐个标签处理：白名单外的标签剥掉（保留内部文字），白名单内的只留必要属性
-  s = s.replace(/<(\/?)([a-zA-Z][a-zA-Z0-9]*)((?:\s[^>]*?)?)(\/?)>/g, (m, close, tag, attrs) => {
-    const name = tag.toLowerCase();
-    if (!KEEP_TAGS.has(name)) return '';
-    if (close) return `</${name}>`;
-
-    let kept = '';
-    const keepList = ATTR_KEEP[name] || [];
-    for (const attr of keepList) {
-      const re = new RegExp(`\\s${attr}\\s*=\\s*("([^"]*)"|'([^']*)'|([^\\s>]+))`, 'i');
-      const mm = attrs.match(re);
-      const val = (mm && (mm[2] ?? mm[3] ?? mm[4])) || '';
-      const v = val.trim();
-      if (!v) continue;
-      if (name === 'a' && !/^(https?:|mailto:|\/)/i.test(v)) continue;
-      kept += ` ${attr}="${v.replace(/"/g, '&quot;')}"`;
-    }
-    return VOID_TAGS.has(name) ? `<${name}${kept}/>` : `<${name}${kept}>`;
-  });
-
-  s = s
-    .replace(/&nbsp;/gi, ' ')
-    .replace(/\s+/g, ' ')
-    .replace(/>\s+</g, '><')
-    // 去掉空段落
-    .replace(/<p>(?:<br\/?>|\s)*<\/p>/gi, '')
-    .replace(/<p>&#160;<\/p>/gi, '')
-    .trim();
-
-  // 开头若残留无标签文字，包进 <p>
-  if (s && !s.startsWith('<')) s = '<p>' + s;
-
-  // 小标题升级为块级标题标签：部分阅读器会丢掉行内 <strong>，但标题标签一定按粗体渲染
-  s = s.replace(/<p>\s*<strong>([^<]{1,80})<\/strong>([\s\S]*?)<\/p>/g, (m, strongText, rest) => {
-    const t = strongText.trim();
-    const body = rest.trim();
-    if (isSectionHeading(t)) return body ? `<h4>${t}</h4><p>${body}</p>` : `<h4>${t}</h4>`;
-    if (!body) return `<h3>${t}</h3>`; // 整段只有一句加粗：当作标题行（文号/发文机关标题等）
-    return m; // 段落中间的加粗照旧
-  });
-
-  return s;
-}
-
-/** 判断一段加粗文字是不是公文里的小标题（一、 / （一） / 1. 开头） */
-const isSectionHeading = (t) =>
-  /^([一二三四五六七八九十百]+[、.．]|（[一二三四五六七八九十百]+）|\([一二三四五六七八九十百]+\)|\d+[、.．])/.test(t);
-
-/** 纯文本长度（用于截断判断） */
-const textLength = (html) => decodeEntities(html.replace(/<[^>]+>/g, '')).replace(/\s+/g, ' ').trim().length;
-
-/** 超出字数上限时，按 </p> 边界截断并补省略号 */
-function truncateHtml(html, max) {
-  if (max <= 0 || textLength(html) <= max) return html;
-  const parts = html.split(/(?<=<\/p>)/);
-  let out = '';
-  let len = 0;
-  for (const p of parts) {
-    const l = textLength(p);
-    if (len + l > max) break;
-    out += p;
-    len += l;
-  }
-  return (out || html.slice(0, max)) + '<p>……（全文请点原文链接）</p>';
-}
-
-/** 解析公文页面：元数据表 + 正文（保留基本排版） */
 function extractArticle(html) {
   const meta = {};
   for (const m of html.matchAll(/<b>([^<]+?)：<\/b><\/td>\s*<td[^>]*>([\s\S]*?)<\/td>/g)) {
@@ -215,24 +92,6 @@ function extractArticle(html) {
   if (i === -1) return { meta, contentHtml: '' };
   const block = sliceDiv(html, html.lastIndexOf('<div', i));
   return { meta, contentHtml: sanitizeContent(block) };
-}
-
-function loadContentCache(file) {
-  try {
-    const c = JSON.parse(fs.readFileSync(file, 'utf8'));
-    if (c && typeof c === 'object') return c;
-  } catch {
-    /* 首次运行 */
-  }
-  return {};
-}
-
-function saveContentCache(file, cache) {
-  try {
-    fs.writeFileSync(file, JSON.stringify(cache, null, 2), 'utf8');
-  } catch (e) {
-    console.warn(`[warn] 正文缓存写入失败：${e.message}`);
-  }
 }
 
 /* ---------------- 生成 RSS ---------------- */

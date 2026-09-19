@@ -41,6 +41,8 @@ node "%~dp0gen-c.mjs" --out feed-c.xml --limit 100 --with-content --content-limi
 if errorlevel 1 echo    [warn] c failed
 node "%~dp0gen-d.mjs" --out feed-d.xml --limit 30 --self "https://cdn.jsdelivr.net/gh/%GHUSER%/%GHREPO%@main/feed-d.xml"
 if errorlevel 1 echo    [warn] d failed
+node "%~dp0gen-e.mjs" --out feed-e.xml --limit 50 --with-content --content-limit 20 --guid-version 1 --self "https://cdn.jsdelivr.net/gh/%GHUSER%/%GHREPO%@main/feed-e.xml"
+if errorlevel 1 echo    [warn] e failed
 
 echo 2/3
 git fetch origin main >nul 2>nul
