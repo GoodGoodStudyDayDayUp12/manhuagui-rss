@@ -114,7 +114,78 @@ function sliceDiv(html, startIdx) {
   return html.slice(startIdx);
 }
 
-/** 解析公文页面：元数据表 + 正文段落 */
+/** 清洗正文：只保留基本排版标签（加粗、标题、列表、表格、链接、图片），去掉所有属性里的样式类名 */
+const KEEP_TAGS = new Set([
+  'p', 'br', 'hr', 'strong', 'b', 'em', 'i', 'u', 's', 'sub', 'sup',
+  'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+  'ul', 'ol', 'li', 'blockquote',
+  'table', 'thead', 'tbody', 'tfoot', 'tr', 'td', 'th',
+  'a', 'img',
+]);
+const VOID_TAGS = new Set(['br', 'hr', 'img']);
+const ATTR_KEEP = { a: ['href'], img: ['src', 'alt'] };
+
+function sanitizeContent(raw) {
+  let s = raw
+    .replace(/<script[\s\S]*?<\/script>/gi, '')
+    .replace(/<style[\s\S]*?<\/style>/gi, '')
+    .replace(/<noscript[\s\S]*?<\/noscript>/gi, '')
+    .replace(/<!--[\s\S]*?-->/g, '')
+    .replace(/<o:p[\s\S]*?<\/o:p>/gi, '');
+
+  // 逐个标签处理：白名单外的标签剥掉（保留内部文字），白名单内的只留必要属性
+  s = s.replace(/<(\/?)([a-zA-Z][a-zA-Z0-9]*)((?:\s[^>]*?)?)(\/?)>/g, (m, close, tag, attrs) => {
+    const name = tag.toLowerCase();
+    if (!KEEP_TAGS.has(name)) return '';
+    if (close) return `</${name}>`;
+
+    let kept = '';
+    const keepList = ATTR_KEEP[name] || [];
+    for (const attr of keepList) {
+      const re = new RegExp(`\\s${attr}\\s*=\\s*("([^"]*)"|'([^']*)'|([^\\s>]+))`, 'i');
+      const mm = attrs.match(re);
+      const val = (mm && (mm[2] ?? mm[3] ?? mm[4])) || '';
+      const v = val.trim();
+      if (!v) continue;
+      if (name === 'a' && !/^(https?:|mailto:|\/)/i.test(v)) continue;
+      kept += ` ${attr}="${v.replace(/"/g, '&quot;')}"`;
+    }
+    return VOID_TAGS.has(name) ? `<${name}${kept}/>` : `<${name}${kept}>`;
+  });
+
+  s = s
+    .replace(/&nbsp;/gi, ' ')
+    .replace(/\s+/g, ' ')
+    .replace(/>\s+</g, '><')
+    // 去掉空段落
+    .replace(/<p>(?:<br\/?>|\s)*<\/p>/gi, '')
+    .replace(/<p>&#160;<\/p>/gi, '')
+    .trim();
+
+  // 开头若残留无标签文字，包进 <p>
+  if (s && !s.startsWith('<')) s = '<p>' + s;
+  return s;
+}
+
+/** 纯文本长度（用于截断判断） */
+const textLength = (html) => decodeEntities(html.replace(/<[^>]+>/g, '')).replace(/\s+/g, ' ').trim().length;
+
+/** 超出字数上限时，按 </p> 边界截断并补省略号 */
+function truncateHtml(html, max) {
+  if (max <= 0 || textLength(html) <= max) return html;
+  const parts = html.split(/(?<=<\/p>)/);
+  let out = '';
+  let len = 0;
+  for (const p of parts) {
+    const l = textLength(p);
+    if (len + l > max) break;
+    out += p;
+    len += l;
+  }
+  return (out || html.slice(0, max)) + '<p>……（全文请点原文链接）</p>';
+}
+
+/** 解析公文页面：元数据表 + 正文（保留基本排版） */
 function extractArticle(html) {
   const meta = {};
   for (const m of html.matchAll(/<b>([^<]+?)：<\/b><\/td>\s*<td[^>]*>([\s\S]*?)<\/td>/g)) {
@@ -124,24 +195,9 @@ function extractArticle(html) {
   }
 
   const i = html.indexOf('id="UCAP-CONTENT"');
-  if (i === -1) return { meta, paragraphs: [] };
+  if (i === -1) return { meta, contentHtml: '' };
   const block = sliceDiv(html, html.lastIndexOf('<div', i));
-
-  const text = decodeEntities(
-    block
-      .replace(/<script[\s\S]*?<\/script>/gi, '')
-      .replace(/<style[\s\S]*?<\/style>/gi, '')
-      .replace(/<br\s*\/?>/gi, '\n')
-      .replace(/<\/(p|div|tr|h\d)>/gi, '\n\n')
-      .replace(/<[^>]+>/g, '')
-  );
-
-  const paragraphs = text
-    .split(/\n{2,}/)
-    .map((s) => s.replace(/[ \t\u00a0]+/g, ' ').replace(/\n+/g, ' ').trim())
-    .filter((s) => s.length > 0);
-
-  return { meta, paragraphs };
+  return { meta, contentHtml: sanitizeContent(block) };
 }
 
 function loadContentCache(file) {
@@ -175,9 +231,7 @@ function buildFeed(items, { selfUrl, filterDesc, guidVersion = '' }) {
         (it.meta['发文字号'] ? `　${esc(it.meta['发文字号'])}` : '') +
         `</p>`;
 
-      const body = it.paragraphs?.length
-        ? '<hr/>' + it.paragraphs.map((p) => `<p>${esc(p)}</p>`).join('')
-        : '';
+      const body = it.contentHtml ? '<hr/>' + it.contentHtml : '';
 
       const foot = `<hr/><p><a href="${esc(it.url)}">${esc(it.url)}</a></p>`;
       const desc = head + body + foot;
@@ -333,7 +387,7 @@ const HELP = `gen-c.mjs
   // 每条默认带空元数据，便于之后统一渲染
   for (const it of items) {
     it.meta = {};
-    it.paragraphs = [];
+    it.contentHtml = '';
   }
 
   /* ---------------- 抓正文（可选） ---------------- */
@@ -348,9 +402,10 @@ const HELP = `gen-c.mjs
     for (let i = 0; i < n; i++) {
       const it = items[i];
       const hit = cache[it.url];
-      if (hit && !opts.refreshContent) {
+      // 旧版缓存里存的是纯文本段落，没有 contentHtml，视为未命中以便重新抓取带排版的版本
+      if (hit && !opts.refreshContent && typeof hit.contentHtml === 'string') {
         it.meta = hit.meta || {};
-        it.paragraphs = hit.paragraphs || [];
+        it.contentHtml = hit.contentHtml;
         fromCache++;
         continue;
       }
@@ -358,11 +413,13 @@ const HELP = `gen-c.mjs
         const html = await get(it.url);
         const art = extractArticle(html);
         it.meta = art.meta;
-        it.paragraphs = art.paragraphs;
-        cache[it.url] = { fetchedAt: new Date().toISOString(), meta: art.meta, paragraphs: art.paragraphs };
+        it.contentHtml = art.contentHtml;
+        cache[it.url] = { fetchedAt: new Date().toISOString(), meta: art.meta, contentHtml: art.contentHtml };
         fetched++;
         console.log(
-          `  ${String(i + 1).padStart(3)}/${n} ✓ ${art.paragraphs.length} 段  ${it.title.slice(0, 34)}`
+          `  ${String(i + 1).padStart(3)}/${n} ✓ ${textLength(art.contentHtml)} 字 / 加粗 ${
+            (art.contentHtml.match(/<(strong|b)>/g) || []).length
+          } 处  ${it.title.slice(0, 30)}`
         );
       } catch (e) {
         failed++;
@@ -371,19 +428,9 @@ const HELP = `gen-c.mjs
       await sleep(350);
     }
 
-    // 截断过长正文
-    if (opts.contentMax > 0) {
-      for (const it of items) {
-        if (!it.paragraphs.length) continue;
-        let total = 0;
-        const out = [];
-        for (const p of it.paragraphs) {
-          if (total >= opts.contentMax) break;
-          out.push(p.length > opts.contentMax - total ? p.slice(0, opts.contentMax - total) + '…' : p);
-          total += p.length;
-        }
-        it.paragraphs = out;
-      }
+    // 超出字数上限时按段落边界截断
+    for (const it of items) {
+      if (it.contentHtml) it.contentHtml = truncateHtml(it.contentHtml, opts.contentMax);
     }
 
     // 只保留当前条目用到的缓存，避免文件无限增长

@@ -38,7 +38,7 @@ jobs:
         run: |
           for i in 1 2 3; do
             if node gen-c.mjs --out feed-c.xml --limit 100 --with-content --content-limit 20 \
-                 --guid-version 2 \
+                 --guid-version 3 \
                  --self "https://cdn.jsdelivr.net/gh/${{ github.repository }}@main/feed-c.xml"; then
               exit 0
             fi
