@@ -163,7 +163,7 @@ function saveContentCache(file, cache) {
 }
 
 /* ---------------- 生成 RSS ---------------- */
-function buildFeed(items, { selfUrl, filterDesc }) {
+function buildFeed(items, { selfUrl, filterDesc, guidVersion = '' }) {
   const now = new Date();
   const newest = items[0]?.date || now;
   const itemXml = items
@@ -186,10 +186,13 @@ function buildFeed(items, { selfUrl, filterDesc }) {
         (it.meta['发文机关'] ? `\n      <category>${esc(it.meta['发文机关'])}</category>` : '') +
         (it.meta['主题分类'] ? `\n      <category>${esc(it.meta['主题分类'])}</category>` : '');
 
+      const guidValue = guidVersion ? `${it.url}#${guidVersion}` : it.url;
+      const guidAttr = guidVersion ? ' isPermaLink="false"' : ' isPermaLink="true"';
+
       return `    <item>
       <title>${esc(it.title)}</title>
       <link>${esc(it.url)}</link>
-      <guid isPermaLink="true">${esc(it.url)}</guid>
+      <guid${guidAttr}>${esc(guidValue)}</guid>
       <description>${cdata(desc)}</description>
 ${extraCategories}${it.date ? `\n      <pubDate>${it.date.toUTCString()}</pubDate>` : ''}
     </item>`;
@@ -231,6 +234,7 @@ function parseArgs(argv) {
     contentMax: 12000,
     contentCache: '.s-c.json',
     refreshContent: false,
+    guidVersion: '',
   };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
@@ -247,6 +251,7 @@ function parseArgs(argv) {
       case '--self': opts.self = next(); break;
       case '--all': opts.all = true; break;
       case '--force': opts.force = true; break;
+      case '--guid-version': opts.guidVersion = next(); break;
       case '--with-content': opts.withContent = true; break;
       case '--content-limit': opts.contentLimit = Number(next()); break;
       case '--content-max': opts.contentMax = Number(next()); break;
@@ -271,6 +276,7 @@ const HELP = `gen-c.mjs
   --since <日期>     该日期之后
   --filter <正则>    标题过滤
   --self <URL>       写入 atom:link self
+  --guid-version <v> 给条目 GUID 加版本号（改它可让阅读器把全部条目当新条目重新导入）
   --force            强制重写文件
   --with-content     抓取正文与元数据
   --content-limit <n> 前 n 条抓正文（默认 20）
@@ -397,7 +403,7 @@ const HELP = `gen-c.mjs
     );
   }
 
-  const xml = buildFeed(items, { selfUrl: opts.self, filterDesc });
+  const xml = buildFeed(items, { selfUrl: opts.self, filterDesc, guidVersion: opts.guidVersion });
   const newest = items[0];
   console.log(`\n输出 ${items.length} 条，最新：${newest.dateRaw} ${newest.title.slice(0, 40)}`);
   console.log(`最旧：${items[items.length - 1].dateRaw}`);

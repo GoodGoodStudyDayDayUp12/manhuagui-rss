@@ -37,7 +37,7 @@ git config --local user.email "%GHUSER%@users.noreply.github.com"
 echo 1/3
 node "%~dp0gen-a.mjs" --config config.json
 if errorlevel 1 echo    [warn] a failed
-node "%~dp0gen-c.mjs" --out feed-c.xml --limit 100 --with-content --content-limit 20 --self "https://cdn.jsdelivr.net/gh/%GHUSER%/%GHREPO%@main/feed-c.xml"
+node "%~dp0gen-c.mjs" --out feed-c.xml --limit 100 --with-content --content-limit 20 --guid-version 2 --self "https://cdn.jsdelivr.net/gh/%GHUSER%/%GHREPO%@main/feed-c.xml"
 if errorlevel 1 echo    [warn] c failed
 
 echo 2/3
