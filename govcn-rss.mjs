@@ -93,22 +93,119 @@ async function fetchJson(url, retries = 3) {
   throw last;
 }
 
+/* ---------------- 正文抓取 ---------------- */
+const decodeEntities = (s) =>
+  String(s ?? '')
+    .replace(/&#x([0-9a-f]+);/gi, (_, h) => String.fromCodePoint(parseInt(h, 16)))
+    .replace(/&#(\d+);/g, (_, d) => String.fromCodePoint(Number(d)))
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;|&apos;/g, "'")
+    .replace(/&mdash;/g, '—')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&');
+
+const cleanText = (s) => decodeEntities(String(s).replace(/<[^>]+>/g, ' ')).replace(/[ \t\u00a0]+/g, ' ').trim();
+
+/** 从 startIdx（指向 <div）开始按 div 深度截取整个元素 */
+function sliceDiv(html, startIdx) {
+  let depth = 0;
+  let j = startIdx;
+  while (j < html.length) {
+    const o = html.indexOf('<div', j);
+    const c = html.indexOf('</div>', j);
+    if (c === -1) break;
+    if (o !== -1 && o < c) {
+      depth++;
+      j = o + 4;
+    } else {
+      depth--;
+      j = c + 6;
+      if (depth === 0) return html.slice(startIdx, j);
+    }
+  }
+  return html.slice(startIdx);
+}
+
+/** 解析公文页面：元数据表 + 正文段落 */
+function extractArticle(html) {
+  const meta = {};
+  for (const m of html.matchAll(/<b>([^<]+?)：<\/b><\/td>\s*<td[^>]*>([\s\S]*?)<\/td>/g)) {
+    const key = m[1].replace(/\s+/g, '');
+    const val = cleanText(m[2]);
+    if (val) meta[key] = val;
+  }
+
+  const i = html.indexOf('id="UCAP-CONTENT"');
+  if (i === -1) return { meta, paragraphs: [] };
+  const block = sliceDiv(html, html.lastIndexOf('<div', i));
+
+  const text = decodeEntities(
+    block
+      .replace(/<script[\s\S]*?<\/script>/gi, '')
+      .replace(/<style[\s\S]*?<\/style>/gi, '')
+      .replace(/<br\s*\/?>/gi, '\n')
+      .replace(/<\/(p|div|tr|h\d)>/gi, '\n\n')
+      .replace(/<[^>]+>/g, '')
+  );
+
+  const paragraphs = text
+    .split(/\n{2,}/)
+    .map((s) => s.replace(/[ \t\u00a0]+/g, ' ').replace(/\n+/g, ' ').trim())
+    .filter((s) => s.length > 0);
+
+  return { meta, paragraphs };
+}
+
+function loadContentCache(file) {
+  try {
+    const c = JSON.parse(fs.readFileSync(file, 'utf8'));
+    if (c && typeof c === 'object') return c;
+  } catch {
+    /* 首次运行 */
+  }
+  return {};
+}
+
+function saveContentCache(file, cache) {
+  try {
+    fs.writeFileSync(file, JSON.stringify(cache, null, 2), 'utf8');
+  } catch (e) {
+    console.warn(`[warn] 正文缓存写入失败：${e.message}`);
+  }
+}
+
 /* ---------------- 生成 RSS ---------------- */
 function buildFeed(items, { selfUrl, filterDesc }) {
   const now = new Date();
   const newest = items[0]?.date || now;
   const itemXml = items
     .map((it) => {
-      const desc =
-        `<p>${esc(it.title)}</p>` +
-        `<p>发布日期：${esc(it.dateRaw)}　来源：中国政府网</p>` +
-        `<p><a href="${esc(it.url)}">${esc(it.url)}</a></p>`;
+      const head =
+        `<p><strong>${esc(it.title)}</strong></p>` +
+        `<p>${esc(it.dateRaw)}　来源：中国政府网` +
+        (it.meta['发文机关'] ? `　发文机关：${esc(it.meta['发文机关'])}` : '') +
+        (it.meta['发文字号'] ? `　${esc(it.meta['发文字号'])}` : '') +
+        `</p>`;
+
+      const body = it.paragraphs?.length
+        ? '<hr/>' + it.paragraphs.map((p) => `<p>${esc(p)}</p>`).join('')
+        : '';
+
+      const foot = `<hr/><p><a href="${esc(it.url)}">${esc(it.url)}</a></p>`;
+      const desc = head + body + foot;
+
+      const extraCategories =
+        (it.meta['发文机关'] ? `\n      <category>${esc(it.meta['发文机关'])}</category>` : '') +
+        (it.meta['主题分类'] ? `\n      <category>${esc(it.meta['主题分类'])}</category>` : '');
+
       return `    <item>
       <title>${esc(it.title)}</title>
       <link>${esc(it.url)}</link>
       <guid isPermaLink="true">${esc(it.url)}</guid>
       <description>${cdata(desc)}</description>
-      <category>最新政策</category>${it.date ? `\n      <pubDate>${it.date.toUTCString()}</pubDate>` : ''}
+      <category>最新政策</category>${extraCategories}${it.date ? `\n      <pubDate>${it.date.toUTCString()}</pubDate>` : ''}
     </item>`;
     })
     .join('\n');
@@ -135,7 +232,20 @@ ${itemXml}
 
 /* ---------------- CLI ---------------- */
 function parseArgs(argv) {
-  const opts = { limit: 50, out: 'govcn-feed.xml', since: null, filter: null, all: false, self: null, force: false };
+  const opts = {
+    limit: 50,
+    out: 'govcn-feed.xml',
+    since: null,
+    filter: null,
+    all: false,
+    self: null,
+    force: false,
+    withContent: false,
+    contentLimit: 20,
+    contentMax: 12000,
+    contentCache: '.govcn-content-cache.json',
+    refreshContent: false,
+  };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     const next = () => {
@@ -151,6 +261,11 @@ function parseArgs(argv) {
       case '--self': opts.self = next(); break;
       case '--all': opts.all = true; break;
       case '--force': opts.force = true; break;
+      case '--with-content': opts.withContent = true; break;
+      case '--content-limit': opts.contentLimit = Number(next()); break;
+      case '--content-max': opts.contentMax = Number(next()); break;
+      case '--content-cache': opts.contentCache = next(); break;
+      case '--refresh-content': opts.refreshContent = true; break;
       case '-h': case '--help': opts.help = true; break;
       default:
         if (a.startsWith('-')) throw new Error(`未知参数: ${a}`);
@@ -171,6 +286,13 @@ const HELP = `govcn-rss —— 中国政府网「最新政策」RSS 生成器
   --filter <正则>    标题过滤，如 "条例|办法"
   --self <URL>       写入 atom:link rel="self"（托管后的地址）
   --force            即使内容没变化也重写文件
+
+正文相关:
+  --with-content     抓取每篇公文的正文与元数据（发文机关/发文字号/主题分类）放进 item
+  --content-limit <n> 只抓前 n 条的正文（默认 20，0 = 全部命中项）
+  --content-max <n>  每条正文最多保留多少字符（默认 12000，0 = 不限）
+  --content-cache <文件> 正文缓存（默认 .govcn-content-cache.json），命中缓存不重复抓取
+  --refresh-content  忽略缓存重新抓正文
   -h, --help         帮助
 `;
 
@@ -218,13 +340,86 @@ const HELP = `govcn-rss —— 中国政府网「最新政策」RSS 生成器
 
   if (!items.length) throw new Error('过滤后没有条目，请放宽条件');
 
+  // 每条默认带空元数据，便于之后统一渲染
+  for (const it of items) {
+    it.meta = {};
+    it.paragraphs = [];
+  }
+
+  /* ---------------- 抓正文（可选） ---------------- */
+  if (opts.withContent) {
+    const n = opts.contentLimit > 0 ? Math.min(opts.contentLimit, items.length) : items.length;
+    const cache = loadContentCache(opts.contentCache);
+    let fetched = 0;
+    let fromCache = 0;
+    let failed = 0;
+
+    console.log(`\n抓取正文：前 ${n} 条（缓存文件 ${opts.contentCache}）`);
+    for (let i = 0; i < n; i++) {
+      const it = items[i];
+      const hit = cache[it.url];
+      if (hit && !opts.refreshContent) {
+        it.meta = hit.meta || {};
+        it.paragraphs = hit.paragraphs || [];
+        fromCache++;
+        continue;
+      }
+      try {
+        const html = await get(it.url);
+        const art = extractArticle(html);
+        it.meta = art.meta;
+        it.paragraphs = art.paragraphs;
+        cache[it.url] = { fetchedAt: new Date().toISOString(), meta: art.meta, paragraphs: art.paragraphs };
+        fetched++;
+        console.log(
+          `  ${String(i + 1).padStart(3)}/${n} ✓ ${art.paragraphs.length} 段  ${it.title.slice(0, 34)}`
+        );
+      } catch (e) {
+        failed++;
+        console.warn(`  ${String(i + 1).padStart(3)}/${n} ✗ ${it.title.slice(0, 34)}（${e.message}）`);
+      }
+      await sleep(350);
+    }
+
+    // 截断过长正文
+    if (opts.contentMax > 0) {
+      for (const it of items) {
+        if (!it.paragraphs.length) continue;
+        let total = 0;
+        const out = [];
+        for (const p of it.paragraphs) {
+          if (total >= opts.contentMax) break;
+          out.push(p.length > opts.contentMax - total ? p.slice(0, opts.contentMax - total) + '…' : p);
+          total += p.length;
+        }
+        it.paragraphs = out;
+      }
+    }
+
+    // 只保留当前条目用到的缓存，避免文件无限增长
+    const keep = new Set(items.map((x) => x.url));
+    let dropped = 0;
+    for (const k of Object.keys(cache)) {
+      if (!keep.has(k)) {
+        delete cache[k];
+        dropped++;
+      }
+    }
+
+    saveContentCache(opts.contentCache, cache);
+    console.log(
+      `正文抓取完成：新抓 ${fetched} 条，用缓存 ${fromCache} 条，失败 ${failed} 条` +
+        (dropped ? `，清理过期缓存 ${dropped} 条` : '')
+    );
+  }
+
   const xml = buildFeed(items, { selfUrl: opts.self, filterDesc });
   const newest = items[0];
   console.log(`\n输出 ${items.length} 条，最新：${newest.dateRaw} ${newest.title.slice(0, 40)}`);
   console.log(`最旧：${items[items.length - 1].dateRaw}`);
 
-  // 条目完全没变时不重写文件，避免每次运行都产生一个只有 lastBuildDate 变化的提交
-  const signature = (s) => (s.match(/<guid[^>]*>([\s\S]*?)<\/guid>/g) || []).join('|');
+  // 条目内容（含正文）完全没变时不重写文件，避免每次运行都产生只有 lastBuildDate 变化的提交
+  const signature = (s) => (s.match(/<item>[\s\S]*?<\/item>/g) || []).join('\n');
   if (!opts.force && fs.existsSync(opts.out)) {
     const prev = fs.readFileSync(opts.out, 'utf8');
     if (signature(prev) === signature(xml)) {

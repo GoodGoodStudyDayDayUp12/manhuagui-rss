@@ -43,7 +43,7 @@ jobs:
       - name: 生成中国政府网「最新政策」订阅
         run: |
           for i in 1 2 3; do
-            if node govcn-rss.mjs --out govcn-feed.xml --limit 100; then
+            if node govcn-rss.mjs --out govcn-feed.xml --limit 100 --with-content --content-limit 20; then
               exit 0
             fi
             echo "::warning::第 $i 次抓取失败，3 分钟后重试"
@@ -62,7 +62,7 @@ jobs:
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A -- '*.xml' '.feed-state.json'
+          git add -A -- '*.xml' '.feed-state.json' '.govcn-content-cache.json'
           if git diff --cached --quiet; then
             echo "没有变化，跳过提交"
             exit 0

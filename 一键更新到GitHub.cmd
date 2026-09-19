@@ -77,7 +77,7 @@ goto DONE
 :GENFEEDS
 node "%~dp0manhuagui-rss.mjs" --config feeds.json
 if errorlevel 1 echo    [警告] 漫画源生成失败（站点可能限流），本次跳过
-node "%~dp0govcn-rss.mjs" --out govcn-feed.xml --limit 100
+node "%~dp0govcn-rss.mjs" --out govcn-feed.xml --limit 100 --with-content --content-limit 20
 if errorlevel 1 echo    [警告] 中国政府网源生成失败，本次跳过
 goto :eof
 

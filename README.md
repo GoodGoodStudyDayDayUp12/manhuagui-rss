@@ -1,4 +1,4 @@
-# RSS 订阅源仓库（GitHub Actions + Folo）
+﻿# RSS 订阅源仓库（GitHub Actions + Folo）
 
 这个仓库用 **GitHub Actions 每天自动**生成多个 RSS 源并提交回仓库，
 你只需要把仓库里 XML 的**公开地址**丢给 Folo 之类的云端阅读器即可长期订阅。
@@ -22,7 +22,8 @@
 | `.github/workflows/rss.yml` | 每天定时跑全部脚本、校验 XML、把结果提交回仓库 |
 | `manhuagui-<id>.xml` | 每部漫画各自的订阅源（首次运行后生成） |
 | `manhuagui-all.xml` | 所有漫画合并成一个订阅源（推荐订这个） |
-| `govcn-feed.xml` | 中国政府网最新政策订阅源（默认最近 100 条） |
+| `govcn-feed.xml` | 中国政府网最新政策订阅源（最近 100 条，其中前 20 条带**公文正文全文**与发文机关/发文字号/主题分类） |
+| `.govcn-content-cache.json` | 公文正文缓存，提交它可以避免每天重复抓取 |
 | `.feed-state.json` | 状态文件，**必须提交**，用于稳定 `pubDate` |
 
 ## 最快的方式：桌面一键更新
