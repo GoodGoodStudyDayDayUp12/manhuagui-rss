@@ -5,6 +5,7 @@
 //
 // 选项:
 //   --mid <ID>         空间 ID（默认已内置）
+//   --title <名称>     订阅源名称（默认 订阅源 D）
 //   --out <文件>       输出文件（默认 feed-d.xml）
 //   --limit <n>        输出条数（默认 30，接口每页 30 条）
 //   --self <URL>       写入 atom:link self
@@ -194,7 +195,7 @@ const cdata = (s) => '<![CDATA[' + String(s ?? '').replace(/]]>/g, ']]]]><![CDAT
 const stripTags = (s) => String(s ?? '').replace(/<[^>]+>/g, '').trim();
 const httpsPic = (u) => (u ? String(u).replace(/^http:\/\//i, 'https://') : '');
 
-function buildFeed(videos, { mid, selfUrl, guidVersion }) {
+function buildFeed(videos, { mid, selfUrl, guidVersion, title = '订阅源 D' }) {
   const now = new Date();
   const newest = videos[0]?.date || now;
 
@@ -218,7 +219,7 @@ function buildFeed(videos, { mid, selfUrl, guidVersion }) {
       <link>${esc(v.url)}</link>
       <guid${guidAttr}>${esc(guidValue)}</guid>
       <description>${cdata(desc)}</description>
-      <category>订阅源 D</category>${v.date ? `\n      <pubDate>${v.date.toUTCString()}</pubDate>` : ''}
+      <category>${esc(title)}</category>${v.date ? `\n      <pubDate>${v.date.toUTCString()}</pubDate>` : ''}
     </item>`;
     })
     .join('\n');
@@ -226,9 +227,9 @@ function buildFeed(videos, { mid, selfUrl, guidVersion }) {
   return `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
   <channel>
-    <title>订阅源 D</title>
+    <title>${esc(title)}</title>
     <link>${esc(`https://space.bilibili.com/${mid}`)}</link>
-    <description>订阅源 D</description>
+    <description>${esc(title)}</description>
     <language>zh-CN</language>
     <lastBuildDate>${now.toUTCString()}</lastBuildDate>
     <pubDate>${newest.toUTCString()}</pubDate>
@@ -244,6 +245,7 @@ ${itemXml}
 function parseArgs(argv) {
   const opts = {
     mid: MID_DEFAULT,
+    title: '订阅源 D',
     out: 'feed-d.xml',
     limit: PAGE_SIZE,
     self: null,
@@ -263,6 +265,7 @@ function parseArgs(argv) {
     };
     switch (a) {
       case '--mid': opts.mid = next(); break;
+      case '--title': opts.title = next(); break;
       case '--out': opts.out = next(); break;
       case '--limit': opts.limit = Number(next()); break;
       case '--self': opts.self = next(); break;
@@ -285,6 +288,7 @@ const HELP = `gen-d.mjs
 
 选项:
   --mid <ID>         空间 ID（已内置默认值）
+  --title <名称>     订阅源名称（默认 订阅源 D）
   --out <文件>       输出文件（默认 feed-d.xml）
   --limit <n>        输出条数（默认 30）
   --self <URL>       写入 atom:link self
@@ -324,7 +328,7 @@ const HELP = `gen-d.mjs
   if (!videos.length) throw new Error('没有解析到任何视频，接口结构可能已变化');
   videos.sort((a, b) => (b.date?.getTime() || 0) - (a.date?.getTime() || 0));
 
-  let xml = buildFeed(videos, { mid: opts.mid, selfUrl: opts.self, guidVersion: opts.guidVersion });
+  let xml = buildFeed(videos, { mid: opts.mid, selfUrl: opts.self, guidVersion: opts.guidVersion, title: opts.title });
   if (opts.history) xml = mergeHistoryIntoXml(xml, opts.out, { maxItems: opts.maxItems });
 
   const signature = (s) =>

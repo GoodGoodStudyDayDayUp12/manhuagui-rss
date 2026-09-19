@@ -106,6 +106,21 @@ jobs:
           echo "::warning::run g failed"
           exit 1
 
+      # 第二个 B 站源：先等一会儿再请求，避免短时间内连续调用被风控
+      - name: run h
+        continue-on-error: true
+        run: |
+          sleep 90
+          for i in 1 2 3; do
+            if node gen-d.mjs --mid 3493278460676126 --title "订阅源 H" --out feed-h.xml --limit 30 \
+                 --self "https://cdn.jsdelivr.net/gh/${{ github.repository }}@main/feed-h.xml"; then
+              exit 0
+            fi
+            sleep 120
+          done
+          echo "::warning::run h failed"
+          exit 1
+
       - name: check
         run: |
           for f in *.xml; do
