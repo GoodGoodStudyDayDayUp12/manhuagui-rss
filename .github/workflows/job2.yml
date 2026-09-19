@@ -1,0 +1,89 @@
+name: job2
+
+on:
+  schedule:
+    # 每 6 小时一次（UTC 第 41 分钟；与每小时的主任务错开，避免同时推送）
+    - cron: '41 */6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: job2
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+
+      # 两个源之间留出间隔，降低被风控的概率；命中风控时脚本会直接跳过本轮
+      - name: run d
+        continue-on-error: true
+        run: |
+          for i in 1 2 3; do
+            if node gen-d.mjs --out feed-d.xml --limit 30 \
+                 --self "https://cdn.jsdelivr.net/gh/${{ github.repository }}@main/feed-d.xml"; then
+              exit 0
+            fi
+            sleep 120
+          done
+          echo "::warning::run d failed"
+          exit 1
+
+      - name: run h
+        continue-on-error: true
+        run: |
+          sleep 90
+          for i in 1 2 3; do
+            if node gen-d.mjs --mid 3493278460676126 --title "订阅源 H" --out feed-h.xml --limit 30 \
+                 --self "https://cdn.jsdelivr.net/gh/${{ github.repository }}@main/feed-h.xml"; then
+              exit 0
+            fi
+            sleep 120
+          done
+          echo "::warning::run h failed"
+          exit 1
+
+      - name: check
+        run: |
+          for f in feed-d.xml feed-h.xml; do
+            [ -f "$f" ] || continue
+            python3 -c "import xml.dom.minidom; xml.dom.minidom.parse('$f')"
+          done
+
+      - name: push
+        run: |
+          git config user.name  "bot"
+          git config user.email "bot@users.noreply.github.com"
+
+          if git fetch origin "${GITHUB_REF_NAME}" --depth=1; then
+            git reset --soft FETCH_HEAD
+          fi
+
+          # 只提交这两个文件，避免覆盖主任务正在更新的其它源
+          git add -A -- 'feed-d.xml' 'feed-h.xml'
+          if git diff --cached --quiet; then
+            echo "no change"
+            exit 0
+          fi
+          git commit -m "update"
+
+          if ! git push; then
+            git fetch origin "${GITHUB_REF_NAME}"
+            git reset --soft FETCH_HEAD
+            git add -A -- 'feed-d.xml' 'feed-h.xml'
+            if git diff --cached --quiet; then
+              echo "no change"
+              exit 0
+            fi
+            git commit -m "update"
+            git push
+          fi

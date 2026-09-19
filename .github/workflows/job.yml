@@ -52,19 +52,6 @@ jobs:
           echo "::warning::run c failed"
           exit 1
 
-      - name: run d
-        continue-on-error: true
-        run: |
-          for i in 1 2 3; do
-            if node gen-d.mjs --out feed-d.xml --limit 30 \
-                 --self "https://cdn.jsdelivr.net/gh/${{ github.repository }}@main/feed-d.xml"; then
-              exit 0
-            fi
-            sleep 120
-          done
-          echo "::warning::run d failed"
-          exit 1
-
       - name: run e
         continue-on-error: true
         run: |
@@ -106,21 +93,6 @@ jobs:
           echo "::warning::run g failed"
           exit 1
 
-      # 第二个 B 站源：先等一会儿再请求，避免短时间内连续调用被风控
-      - name: run h
-        continue-on-error: true
-        run: |
-          sleep 90
-          for i in 1 2 3; do
-            if node gen-d.mjs --mid 3493278460676126 --title "订阅源 H" --out feed-h.xml --limit 30 \
-                 --self "https://cdn.jsdelivr.net/gh/${{ github.repository }}@main/feed-h.xml"; then
-              exit 0
-            fi
-            sleep 120
-          done
-          echo "::warning::run h failed"
-          exit 1
-
       - name: run i
         continue-on-error: true
         run: |
@@ -150,7 +122,7 @@ jobs:
             git reset --soft FETCH_HEAD
           fi
 
-          git add -A -- '*.xml' '.s-a.json' '.s-c.json' '.s-e.json' '.s-g.json'
+          git add -A -- '*.xml' ':!feed-d.xml' ':!feed-h.xml' '.s-a.json' '.s-c.json' '.s-e.json' '.s-g.json'
           if git diff --cached --quiet; then
             echo "no change"
             exit 0
@@ -161,7 +133,7 @@ jobs:
           if ! git push; then
             git fetch origin "${GITHUB_REF_NAME}"
             git reset --soft FETCH_HEAD
-            git add -A -- '*.xml' '.s-a.json' '.s-c.json' '.s-e.json' '.s-g.json'
+            git add -A -- '*.xml' ':!feed-d.xml' ':!feed-h.xml' '.s-a.json' '.s-c.json' '.s-e.json' '.s-g.json'
             if git diff --cached --quiet; then
               echo "no change"
               exit 0
