@@ -286,7 +286,10 @@ function saveState(file, state) {
  * RSS 2.0 生成
  * ------------------------------------------------------------------ */
 
-export function buildFeed(comic, { items, selfUrl, limit = 100, feedTitle, feedDesc, withIntro = false } = {}) {
+export function buildFeed(
+  comic,
+  { items, selfUrl, limit = 100, feedTitle, feedDesc, withIntro = false, withCover = false } = {}
+) {
   const picked = limit > 0 ? items.slice(0, limit) : items;
   const updated = parseSiteDate(comic.updatedAt);
   const lastBuild = new Date();
@@ -301,7 +304,7 @@ export function buildFeed(comic, { items, selfUrl, limit = 100, feedTitle, feedD
   }
 
   const title = feedTitle || `${comic.title} - 漫画更新`;
-  const ctx = { withIntro };
+  const ctx = { withIntro, withCover };
   const itemXml = picked.map((ch) => renderItem(comic, ch, updated, ctx)).join('\n');
 
   return `<?xml version="1.0" encoding="UTF-8"?>
@@ -333,6 +336,9 @@ function renderItem(comic, ch, updated, ctx = {}) {
   const html =
     `<p>${esc(bits.join(' · '))}</p>` +
     `<p><a href="${esc(ch.url)}">${esc(ch.url)}</a></p>` +
+    (ctx.withCover && comic.cover
+      ? `<p><a href="${esc(ch.url)}"><img src="${esc(comic.cover)}" alt="${esc(comic.title)}" /></a></p>`
+      : '') +
     (ctx.withIntro && comic.intro ? `<hr/><p>${esc(comic.intro).replace(/\n/g, '<br/>')}</p>` : '');
 
   const pub = ch.pubDate ? `<pubDate>${ch.pubDate.toUTCString()}</pubDate>` : '';
@@ -406,7 +412,13 @@ async function generate(comics, opts) {
     try {
       const { comic, items, fresh, isFirstRun } = await collect(ref, opts, state);
       const selfUrl = opts.self || (opts.serve ? `http://127.0.0.1:${opts.port}/${comics.length > 1 ? `comic/${comic.id}.xml` : 'feed.xml'}` : null);
-      const xml = buildFeed(comic, { items, selfUrl, limit: opts.limit, withIntro: opts.withIntro });
+      const xml = buildFeed(comic, {
+        items,
+        selfUrl,
+        limit: opts.limit,
+        withIntro: opts.withIntro,
+        withCover: opts.withCover,
+      });
       results.push({ comic, xml, fresh, isFirstRun, error: null });
       console.log(
         `[ok] ${comic.title} (${comic.id})：${comic.chapters.length} 章，输出 ${items.length} 条` +
@@ -648,7 +660,7 @@ function loadConfigFile(file) {
     if (raw[k] !== undefined) cfg[k] = Number(raw[k]);
   }
   if (raw.timeout !== undefined) cfg.timeoutMs = Number(raw.timeout) * 1000;
-  for (const k of ['combined', 'withIntro', 'newOnly', 'serve']) {
+  for (const k of ['combined', 'withIntro', 'withCover', 'newOnly', 'serve']) {
     if (raw[k] !== undefined) cfg[k] = Boolean(raw[k]);
   }
   if (raw.self) cfg.self = String(raw.self);
@@ -665,6 +677,7 @@ function parseArgs(argv) {
     state: '.manhuagui-rss-state.json',
     newOnly: false,
     combined: false,
+    withCover: false,
     serve: false,
     port: 8931,
     interval: 30,
@@ -703,6 +716,7 @@ function parseArgs(argv) {
       case '--self': opts.self = next(); break;
       case '--new-only': opts.newOnly = true; break;
       case '--with-intro': opts.withIntro = true; break;
+      case '--with-cover': opts.withCover = true; break;
       case '--combined': opts.combined = true; break;
       case '--serve': opts.serve = true; break;
       case '-h': case '--help': opts.help = true; break;
@@ -727,6 +741,7 @@ const HELP = `manhuagui-rss ${VERSION} —— 看漫画(manhuagui.com) 漫画更
   --limit <n>        每个源最多输出多少条（默认 100，0 表示全部）
   --new-only         只输出状态文件中未出现过的新章节（首次运行输出全部）
   --with-intro       在每条 item 的简介里附带漫画内容简介（体积更大）
+  --with-cover       在每条 item 里嵌入漫画封面图（阅读器里显示缩略图）
   --state <文件>     状态文件路径（默认 .manhuagui-rss-state.json）
   --combined         多漫画时额外生成 manhuagui-all.xml 合并订阅
   --serve            启动本地 RSS 服务（默认 http://127.0.0.1:8931/feed.xml）

@@ -1,4 +1,4 @@
-name: 更新漫画 RSS
+name: 更新 RSS 订阅源
 
 on:
   # 每天 UTC 04:17 = 北京时间 12:17 自动跑一次
@@ -13,7 +13,7 @@ permissions:
 
 # 避免多次运行互相打架
 concurrency:
-  group: manhuagui-rss
+  group: rss-feeds
   cancel-in-progress: false
 
 jobs:
@@ -40,6 +40,18 @@ jobs:
           echo "::error::三次尝试均失败，本次不更新订阅文件"
           exit 1
 
+      - name: 生成中国政府网「最新政策」订阅
+        run: |
+          for i in 1 2 3; do
+            if node govcn-rss.mjs --out govcn-feed.xml --limit 100; then
+              exit 0
+            fi
+            echo "::warning::第 $i 次抓取失败，3 分钟后重试"
+            sleep 180
+          done
+          echo "::error::中国政府网数据源三次抓取均失败"
+          exit 1
+
       - name: 校验 XML
         run: |
           for f in *.xml; do
@@ -55,5 +67,5 @@ jobs:
             echo "没有变化，跳过提交"
             exit 0
           fi
-          git commit -m "chore: 更新漫画 RSS $(date -u '+%Y-%m-%d %H:%M UTC')"
+          git commit -m "chore: 更新 RSS 订阅源 $(date -u '+%Y-%m-%d %H:%M UTC')"
           git push
