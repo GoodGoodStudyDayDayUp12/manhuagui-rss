@@ -7,6 +7,7 @@ import http from 'node:http';
 import zlib from 'node:zlib';
 import fs from 'node:fs';
 import path from 'node:path';
+import { mergeHistoryIntoXml } from './lib.mjs';
 
 const VERSION = '1.0.0';
 const SITE = 'https://www.manhuagui.com';
@@ -450,12 +451,13 @@ function writeOutputs(results, comics, opts) {
       ? path.join(opts.outdir, comics.length > 1 ? `feed-a-${r.comic.id}.xml` : 'feed-a.xml')
       : path.resolve(opts.out);
     fs.mkdirSync(path.dirname(file), { recursive: true });
-    if (unchanged(file, r.xml)) {
+    const xml = opts.history ? mergeHistoryIntoXml(r.xml, file, { maxItems: opts.maxItems }) : r.xml;
+    if (unchanged(file, xml)) {
       console.log(`[skip] ${file}（内容无变化）`);
       written.push(file);
       continue;
     }
-    fs.writeFileSync(file, r.xml, 'utf8');
+    fs.writeFileSync(file, xml, 'utf8');
     written.push(file);
     console.log(`[write] ${file}`);
   }
@@ -469,7 +471,8 @@ function writeOutputs(results, comics, opts) {
     }
     items.sort((a, b) => (b.date?.getTime() || 0) - (a.date?.getTime() || 0));
     const file = path.join(opts.outdir, 'feed-b.xml');
-    const xml = buildCombinedFeed(ok.map((r) => r.comic), items, opts);
+    let xml = buildCombinedFeed(ok.map((r) => r.comic), items, opts);
+    if (opts.history) xml = mergeHistoryIntoXml(xml, file, { maxItems: opts.maxItems });
     if (unchanged(file, xml)) {
       console.log(`[skip] ${file}（内容无变化）`);
       written.push(file);
@@ -691,6 +694,8 @@ function parseArgs(argv) {
     withIntro: false,
     self: null,
     help: false,
+    history: true,
+    maxItems: 300,
   };
 
   // 先读配置文件作为默认值，命令行参数优先
@@ -724,6 +729,8 @@ function parseArgs(argv) {
       case '--with-cover': opts.withCover = true; break;
       case '--combined': opts.combined = true; break;
       case '--serve': opts.serve = true; break;
+      case '--no-history': opts.history = false; break;
+      case '--max-items': opts.maxItems = Number(next()); break;
       case '-h': case '--help': opts.help = true; break;
       default:
         if (a.startsWith('-')) throw new Error(`未知参数: ${a}`);

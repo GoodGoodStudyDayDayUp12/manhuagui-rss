@@ -201,3 +201,51 @@ export function unchangedFile(file, xml) {
     return false;
   }
 }
+
+/* ---------------- 历史条目保留 ---------------- */
+/** 读取上一次输出里的 item 原始片段 */
+export function loadHistoryItems(file) {
+  try {
+    const xml = fs.readFileSync(file, 'utf8');
+    return [...xml.matchAll(/<item>([\s\S]*?)<\/item>/g)].map((m) => ({
+      raw: m[1].trim(),
+      link: (m[1].match(/<link>([^<]*)<\/link>/) || [])[1] || '',
+      guid: (m[1].match(/<guid[^>]*>([^<]*)<\/guid>/) || [])[1] || '',
+    }));
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * 把「本次抓到的条目」与「上次输出里的旧条目」合并：
+ * 新条目在前，旧条目按原顺序接在后面，重复的丢弃，总数不超过 maxItems。
+ * 这样列表页只有当天内容时（新闻首页、投稿前 30 条等）订阅里仍能保留历史。
+ */
+export function mergeHistoryIntoXml(xml, outFile, { maxItems = 300 } = {}) {
+  const oldItems = loadHistoryItems(outFile);
+  if (!oldItems.length) return xml;
+
+  const blocks = [...xml.matchAll(/<item>[\s\S]*?<\/item>/g)];
+  if (!blocks.length) return xml;
+
+  const merged = blocks.map((m) => m[0]);
+  const seen = new Set(
+    merged.map((b) => (b.match(/<link>([^<]*)<\/link>/) || [])[1] || '').filter(Boolean)
+  );
+
+  for (const old of oldItems) {
+    if (maxItems > 0 && merged.length >= maxItems) break;
+    const key = old.link || old.guid;
+    if (!key || seen.has(key)) continue;
+    seen.add(key);
+    merged.push('    <item>\n      ' + old.raw.replace(/\n\s*/g, '\n      ') + '\n    </item>');
+  }
+
+  if (merged.length === blocks.length) return xml;
+
+  const head = xml.slice(0, blocks[0].index);
+  const last = blocks[blocks.length - 1];
+  const tail = xml.slice(last.index + last[0].length);
+  return head + merged.join('\n') + tail;
+}

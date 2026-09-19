@@ -17,6 +17,7 @@ import {
   saveContentCache,
   pruneCache,
   unchangedFile,
+  mergeHistoryIntoXml,
 } from './lib.mjs';
 
 const DATA_URL = 'https://www.gov.cn/zhengce/zuixin/ZUIXINZHENGCE.json';
@@ -159,6 +160,8 @@ function parseArgs(argv) {
     all: false,
     self: null,
     force: false,
+    history: true,
+    maxItems: 300,
     withContent: false,
     contentLimit: 20,
     contentMax: 12000,
@@ -181,6 +184,8 @@ function parseArgs(argv) {
       case '--self': opts.self = next(); break;
       case '--all': opts.all = true; break;
       case '--force': opts.force = true; break;
+      case '--no-history': opts.history = false; break;
+      case '--max-items': opts.maxItems = Number(next()); break;
       case '--guid-version': opts.guidVersion = next(); break;
       case '--with-content': opts.withContent = true; break;
       case '--content-limit': opts.contentLimit = Number(next()); break;
@@ -331,7 +336,8 @@ const HELP = `gen-c.mjs
     );
   }
 
-  const xml = buildFeed(items, { selfUrl: opts.self, filterDesc, guidVersion: opts.guidVersion });
+  let xml = buildFeed(items, { selfUrl: opts.self, filterDesc, guidVersion: opts.guidVersion });
+  if (opts.history) xml = mergeHistoryIntoXml(xml, opts.out, { maxItems: opts.maxItems });
   const newest = items[0];
   console.log(`\n输出 ${items.length} 条，最新：${newest.dateRaw} ${newest.title.slice(0, 40)}`);
   console.log(`最旧：${items[items.length - 1].dateRaw}`);

@@ -92,6 +92,20 @@ jobs:
           echo "::warning::run f failed"
           exit 1
 
+      - name: run g
+        continue-on-error: true
+        run: |
+          for i in 1 2 3; do
+            if node gen-g.mjs --out feed-g.xml --limit 100 --with-content --content-limit 20 \
+                 --guid-version 1 \
+                 --self "https://cdn.jsdelivr.net/gh/${{ github.repository }}@main/feed-g.xml"; then
+              exit 0
+            fi
+            sleep 60
+          done
+          echo "::warning::run g failed"
+          exit 1
+
       - name: check
         run: |
           for f in *.xml; do
@@ -109,7 +123,7 @@ jobs:
             git reset --soft FETCH_HEAD
           fi
 
-          git add -A -- '*.xml' '.s-a.json' '.s-c.json' '.s-e.json'
+          git add -A -- '*.xml' '.s-a.json' '.s-c.json' '.s-e.json' '.s-g.json'
           if git diff --cached --quiet; then
             echo "no change"
             exit 0
@@ -120,7 +134,7 @@ jobs:
           if ! git push; then
             git fetch origin "${GITHUB_REF_NAME}"
             git reset --soft FETCH_HEAD
-            git add -A -- '*.xml' '.s-a.json' '.s-c.json' '.s-e.json'
+            git add -A -- '*.xml' '.s-a.json' '.s-c.json' '.s-e.json' '.s-g.json'
             if git diff --cached --quiet; then
               echo "no change"
               exit 0

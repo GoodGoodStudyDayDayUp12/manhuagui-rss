@@ -23,6 +23,7 @@ import {
   sanitizeContent,
   absolutizeUrls,
   unchangedFile,
+  mergeHistoryIntoXml,
 } from './lib.mjs';
 
 const PAGE_URL = 'https://api-docs.deepseek.com/zh-cn/updates/';
@@ -170,7 +171,17 @@ ${itemXml}
 
 /* ---------------- CLI ---------------- */
 function parseArgs(argv) {
-  const opts = { url: PAGE_URL, out: 'feed-f.xml', limit: 30, self: null, guidVersion: '', force: false, help: false };
+  const opts = {
+    url: PAGE_URL,
+    out: 'feed-f.xml',
+    limit: 30,
+    self: null,
+    guidVersion: '',
+    force: false,
+    history: true,
+    maxItems: 300,
+    help: false,
+  };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     const next = () => {
@@ -185,6 +196,8 @@ function parseArgs(argv) {
       case '--self': opts.self = next(); break;
       case '--guid-version': opts.guidVersion = next(); break;
       case '--force': opts.force = true; break;
+      case '--no-history': opts.history = false; break;
+      case '--max-items': opts.maxItems = Number(next()); break;
       case '-h': case '--help': opts.help = true; break;
       default:
         if (a.startsWith('-')) throw new Error(`未知参数: ${a}`);
@@ -225,7 +238,8 @@ const HELP = `gen-f.mjs
   entries.sort((a, b) => (b.date?.getTime() || 0) - (a.date?.getTime() || 0));
   if (opts.limit > 0) entries = entries.slice(0, opts.limit);
 
-  const xml = buildFeed(entries, { selfUrl: opts.self, guidVersion: opts.guidVersion });
+  let xml = buildFeed(entries, { selfUrl: opts.self, guidVersion: opts.guidVersion });
+  if (opts.history) xml = mergeHistoryIntoXml(xml, opts.out, { maxItems: opts.maxItems });
 
   if (!opts.force && fs.existsSync(opts.out) && unchangedFile(opts.out, xml)) {
     console.log(`内容无变化，保留原文件 ${opts.out}`);
@@ -234,7 +248,7 @@ const HELP = `gen-f.mjs
 
   fs.writeFileSync(opts.out, xml, 'utf8');
   console.log(`最新：${entries[0].dateRaw} ${entries[0].title.slice(0, 40)}`);
-  console.log(`已写入 ${opts.out}（${entries.length} 条，${(xml.length / 1024).toFixed(1)} KB）`);
+  console.log(`已写入 ${opts.out}（共 ${(xml.match(/<item>/g) || []).length} 条，${(xml.length / 1024).toFixed(1)} KB）`);
 })().catch((e) => {
   console.error('运行失败：' + e.message);
   process.exit(1);

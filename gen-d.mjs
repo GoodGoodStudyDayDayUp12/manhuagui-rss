@@ -17,6 +17,7 @@
 import https from 'node:https';
 import crypto from 'node:crypto';
 import fs from 'node:fs';
+import { mergeHistoryIntoXml } from './lib.mjs';
 
 const MID_DEFAULT = '3493080468556379';
 const API = 'https://api.bilibili.com';
@@ -249,6 +250,8 @@ function parseArgs(argv) {
     guidVersion: '',
     attempts: 3,
     force: false,
+    history: true,
+    maxItems: 300,
     help: false,
   };
   for (let i = 0; i < argv.length; i++) {
@@ -266,6 +269,8 @@ function parseArgs(argv) {
       case '--guid-version': opts.guidVersion = next(); break;
       case '--attempts': opts.attempts = Number(next()); break;
       case '--force': opts.force = true; break;
+      case '--no-history': opts.history = false; break;
+      case '--max-items': opts.maxItems = Number(next()); break;
       case '-h': case '--help': opts.help = true; break;
       default:
         if (a.startsWith('-')) throw new Error(`未知参数: ${a}`);
@@ -319,7 +324,8 @@ const HELP = `gen-d.mjs
   if (!videos.length) throw new Error('没有解析到任何视频，接口结构可能已变化');
   videos.sort((a, b) => (b.date?.getTime() || 0) - (a.date?.getTime() || 0));
 
-  const xml = buildFeed(videos, { mid: opts.mid, selfUrl: opts.self, guidVersion: opts.guidVersion });
+  let xml = buildFeed(videos, { mid: opts.mid, selfUrl: opts.self, guidVersion: opts.guidVersion });
+  if (opts.history) xml = mergeHistoryIntoXml(xml, opts.out, { maxItems: opts.maxItems });
 
   const signature = (s) =>
     s.replace(/<lastBuildDate>[^<]*<\/lastBuildDate>/, '').replace(/<pubDate>[^<]*<\/pubDate>/, '');
@@ -333,7 +339,7 @@ const HELP = `gen-d.mjs
 
   fs.writeFileSync(opts.out, xml, 'utf8');
   console.log(`最新：${videos[0].dateRaw} ${videos[0].title.slice(0, 36)}`);
-  console.log(`已写入 ${opts.out}（${videos.length} 条，${(xml.length / 1024).toFixed(1)} KB）`);
+  console.log(`已写入 ${opts.out}（共 ${(xml.match(/<item>/g) || []).length} 条，${(xml.length / 1024).toFixed(1)} KB）`);
 })().catch((e) => {
   if (e.risk) {
     // 风控命中：当作“本轮跳过”，以成功状态退出，保留上一次的订阅内容，等下一轮再试

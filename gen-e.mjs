@@ -37,6 +37,7 @@ import {
   saveContentCache,
   pruneCache,
   unchangedFile,
+  mergeHistoryIntoXml,
   absolutizeUrls,
 } from './lib.mjs';
 
@@ -309,6 +310,8 @@ function parseArgs(argv) {
     self: null,
     guidVersion: '',
     force: false,
+    history: true,
+    maxItems: 300,
     withContent: false,
     contentLimit: 20,
     contentMax: 12000,
@@ -337,6 +340,8 @@ function parseArgs(argv) {
       case '--content-cache': opts.contentCache = next(); break;
       case '--refresh-content': opts.refreshContent = true; break;
       case '--force': opts.force = true; break;
+      case '--no-history': opts.history = false; break;
+      case '--max-items': opts.maxItems = Number(next()); break;
       case '-h': case '--help': opts.help = true; break;
       default:
         if (a.startsWith('-')) throw new Error(`未知参数: ${a}`);
@@ -442,7 +447,8 @@ const HELP = `gen-e.mjs
     );
   }
 
-  const xml = buildFeed(items, { selfUrl: opts.self, guidVersion: opts.guidVersion });
+  let xml = buildFeed(items, { selfUrl: opts.self, guidVersion: opts.guidVersion });
+  if (opts.history) xml = mergeHistoryIntoXml(xml, opts.out, { maxItems: opts.maxItems });
 
   if (!opts.force && fs.existsSync(opts.out) && unchangedFile(opts.out, xml)) {
     console.log(`内容无变化，保留原文件 ${opts.out}`);
@@ -451,7 +457,7 @@ const HELP = `gen-e.mjs
 
   fs.writeFileSync(opts.out, xml, 'utf8');
   console.log(`最新：${items[0].dateRaw} ${items[0].title.slice(0, 40)}`);
-  console.log(`已写入 ${opts.out}（${items.length} 条，${(xml.length / 1024).toFixed(1)} KB）`);
+  console.log(`已写入 ${opts.out}（共 ${(xml.match(/<item>/g) || []).length} 条，${(xml.length / 1024).toFixed(1)} KB）`);
 })().catch((e) => {
   console.error('运行失败：' + e.message);
   process.exit(1);
