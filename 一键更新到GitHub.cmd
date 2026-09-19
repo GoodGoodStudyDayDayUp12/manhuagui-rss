@@ -116,11 +116,20 @@ goto END
 
 :PUSHFAIL
 echo.
-echo [失败] 推送失败。常见原因：
-echo   1) 仓库名或用户名写错（当前用的是 %REMOTEURL%）
-echo   2) 第一次推送没完成 GitHub 登录
-echo   3) 网络问题
-echo   修好后重新双击本快捷方式即可。
+echo ============================================================
+echo   [失败] 推送没有成功
+echo ============================================================
+echo   当前仓库： %REMOTEURL%
+echo   常见原因：
+echo     1) 第一次推送需要登录 GitHub，浏览器弹窗没有完成（重新双击再试一次）
+echo     2) 报错里提到 workflow scope：本次改动包含 .github/workflows/rss.yml，
+echo        普通 Token 没有权限改它。处理办法二选一：
+echo          a. 用带 workflow 权限的 Token
+echo          b. 先在网页上把 .github/workflows/rss.yml 删掉，再双击本快捷方式
+echo     3) 仓库名或用户名写错
+echo     4) 网络问题（github.com 打不开）
+echo.
+echo   修好后重新双击桌面快捷方式即可。
 
 :END
 echo.
