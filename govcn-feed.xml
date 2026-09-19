@@ -5,11 +5,12 @@
     <link>https://www.gov.cn/zhengce/zuixin/</link>
     <description>中国政府网「最新政策」栏目更新（按发稿时间倒序）。数据源：https://www.gov.cn/zhengce/zuixin/ZUIXINZHENGCE.json</description>
     <language>zh-CN</language>
-    <lastBuildDate>Sat, 19 Sep 2026 07:51:39 GMT</lastBuildDate>
+    <lastBuildDate>Sat, 19 Sep 2026 07:53:18 GMT</lastBuildDate>
     <pubDate>Thu, 17 Sep 2026 16:00:00 GMT</pubDate>
     <generator>govcn-rss 1.0.0</generator>
     <ttl>60</ttl>
     <dc:creator>中国政府网</dc:creator>
+    <atom:link href="https://cdn.jsdelivr.net/gh/GoodGoodStudyDayDayUp12/manhuagui-rss@main/govcn-feed.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>国务院办公厅转发文化和旅游部等部门《关于促进房车消费的若干措施》的通知</title>
       <link>https://www.gov.cn/zhengce/content/202609/content_7081441.htm</link>

@@ -43,7 +43,8 @@ jobs:
       - name: 生成中国政府网「最新政策」订阅
         run: |
           for i in 1 2 3; do
-            if node govcn-rss.mjs --out govcn-feed.xml --limit 100 --with-content --content-limit 20; then
+            if node govcn-rss.mjs --out govcn-feed.xml --limit 100 --with-content --content-limit 20 \
+                 --self "https://cdn.jsdelivr.net/gh/${{ github.repository }}@main/govcn-feed.xml"; then
               exit 0
             fi
             echo "::warning::第 $i 次抓取失败，3 分钟后重试"

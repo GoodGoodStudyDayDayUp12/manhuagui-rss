@@ -418,8 +418,10 @@ const HELP = `govcn-rss —— 中国政府网「最新政策」RSS 生成器
   console.log(`\n输出 ${items.length} 条，最新：${newest.dateRaw} ${newest.title.slice(0, 40)}`);
   console.log(`最旧：${items[items.length - 1].dateRaw}`);
 
-  // 条目内容（含正文）完全没变时不重写文件，避免每次运行都产生只有 lastBuildDate 变化的提交
-  const signature = (s) => (s.match(/<item>[\s\S]*?<\/item>/g) || []).join('\n');
+  // 除构建时间外，频道与条目任何变化都算“有变化”；
+  // 只有 lastBuildDate / 频道 pubDate 变动时视为没变，避免产生空提交
+  const signature = (s) =>
+    s.replace(/<lastBuildDate>[^<]*<\/lastBuildDate>/, '').replace(/<pubDate>[^<]*<\/pubDate>/, '');
   if (!opts.force && fs.existsSync(opts.out)) {
     const prev = fs.readFileSync(opts.out, 'utf8');
     if (signature(prev) === signature(xml)) {
