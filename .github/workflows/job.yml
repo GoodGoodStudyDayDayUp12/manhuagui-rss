@@ -2,7 +2,8 @@ name: job
 
 on:
   schedule:
-    - cron: '17 4 * * *'
+    # 每小时一次（UTC 每小时第 17 分钟 = 北京时间每小时的 17 分）
+    - cron: '17 * * * *'
   workflow_dispatch:
 
 permissions:
@@ -44,6 +45,20 @@ jobs:
             fi
             sleep 180
           done
+          exit 1
+
+      # 空间接口有风控，失败不影响其它源，也不让整个任务变红
+      - name: run d
+        continue-on-error: true
+        run: |
+          for i in 1 2 3; do
+            if node gen-d.mjs --out feed-d.xml --limit 30 \
+                 --self "https://cdn.jsdelivr.net/gh/${{ github.repository }}@main/feed-d.xml"; then
+              exit 0
+            fi
+            sleep 60
+          done
+          echo "::warning::run d failed"
           exit 1
 
       - name: check

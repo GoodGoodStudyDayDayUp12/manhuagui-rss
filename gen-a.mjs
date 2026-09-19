@@ -353,8 +353,8 @@ async function collect(comicRef, opts, state) {
 
   const rec = (state.comics[comic.id] ||= { seen: {}, title: comic.title });
   rec.title = comic.title;
-  rec.lastCheck = new Date().toISOString();
   rec.lastUpdatedAt = comic.updatedAt;
+  // 注意：这里不写“上次检查时间”，否则每次运行状态文件都会变，定时任务会不停产生空提交
 
   // 组装 item：站点顺序为最新在前
   const latestDate = parseSiteDate(comic.updatedAt);
@@ -429,15 +429,32 @@ async function generate(comics, opts) {
  * ------------------------------------------------------------------ */
 
 function writeOutputs(results, comics, opts) {
-  // 显式给了 outdir（命令行或配置文件）时，即使只有一部漫画也用 manhuagui-<id>.xml 命名，便于托管
+  // 显式给了 outdir（命令行或配置文件）时，即使只有一部漫画也用 feed-a.xml 命名，便于托管
   const multi = comics.length > 1 || opts.outdirExplicit;
   const written = [];
+
+  // 除构建时间外内容没变就不重写文件，避免定时任务产生只有 lastBuildDate 变化的提交
+  const signature = (s) =>
+    s.replace(/<lastBuildDate>[^<]*<\/lastBuildDate>/, '').replace(/<pubDate>[^<]*<\/pubDate>/, '');
+  const unchanged = (file, xml) => {
+    try {
+      return signature(fs.readFileSync(file, 'utf8')) === signature(xml);
+    } catch {
+      return false;
+    }
+  };
+
   for (const r of results) {
     if (!r.xml) continue;
     const file = multi
       ? path.join(opts.outdir, comics.length > 1 ? `feed-a-${r.comic.id}.xml` : 'feed-a.xml')
       : path.resolve(opts.out);
     fs.mkdirSync(path.dirname(file), { recursive: true });
+    if (unchanged(file, r.xml)) {
+      console.log(`[skip] ${file}（内容无变化）`);
+      written.push(file);
+      continue;
+    }
     fs.writeFileSync(file, r.xml, 'utf8');
     written.push(file);
     console.log(`[write] ${file}`);
@@ -452,9 +469,15 @@ function writeOutputs(results, comics, opts) {
     }
     items.sort((a, b) => (b.date?.getTime() || 0) - (a.date?.getTime() || 0));
     const file = path.join(opts.outdir, 'feed-b.xml');
-    fs.writeFileSync(file, buildCombinedFeed(ok.map((r) => r.comic), items, opts), 'utf8');
-    written.push(file);
-    console.log(`[write] ${file}（合并 ${ok.length} 部漫画）`);
+    const xml = buildCombinedFeed(ok.map((r) => r.comic), items, opts);
+    if (unchanged(file, xml)) {
+      console.log(`[skip] ${file}（内容无变化）`);
+      written.push(file);
+    } else {
+      fs.writeFileSync(file, xml, 'utf8');
+      written.push(file);
+      console.log(`[write] ${file}（合并 ${ok.length} 部漫画）`);
+    }
   }
   return written;
 }
