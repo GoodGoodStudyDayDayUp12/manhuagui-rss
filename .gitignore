@@ -1,9 +1,4 @@
-# 仅忽略本地与编辑器产生的文件
 node_modules/
 *.log
 .DS_Store
 Thumbs.db
-
-# 注意：.feed-state.json 必须提交到仓库！
-# 它记录每章首次见到的时间，用来保证每条 item 的 pubDate 稳定，
-# 不提交的话每次生成都会让历史章节的日期漂移。

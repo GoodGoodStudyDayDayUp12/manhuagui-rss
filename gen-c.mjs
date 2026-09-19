@@ -1,20 +1,6 @@
 #!/usr/bin/env node
-/**
- * govcn-rss.mjs —— 把「中国政府网 · 最新政策」做成 RSS 2.0 订阅源
- *
- * 数据来源：页面 https://www.gov.cn/zhengce/zuixin/ 实际加载的
- *          https://www.gov.cn/zhengce/zuixin/ZUIXINZHENGCE.json
- *          （含约 1100 条政策，字段：TITLE / SUB_TITLE / URL / DOCRELPUBTIME）
- *
- * 零依赖，Node.js >= 18。
- *
- * 用法：
- *   node govcn-rss.mjs                          # 生成 govcn-feed.xml（默认最近 50 条）
- *   node govcn-rss.mjs --limit 100 --out 政策.xml
- *   node govcn-rss.mjs --since 2026-01-01       # 只要这个日期之后的
- *   node govcn-rss.mjs --filter "条例|办法|通知"  # 标题关键词过滤（正则）
- *   node govcn-rss.mjs --all                    # 输出全部 1000+ 条
- */
+// gen-c.mjs
+
 
 import https from 'node:https';
 import fs from 'node:fs';
@@ -205,7 +191,7 @@ function buildFeed(items, { selfUrl, filterDesc }) {
       <link>${esc(it.url)}</link>
       <guid isPermaLink="true">${esc(it.url)}</guid>
       <description>${cdata(desc)}</description>
-      <category>最新政策</category>${extraCategories}${it.date ? `\n      <pubDate>${it.date.toUTCString()}</pubDate>` : ''}
+${extraCategories}${it.date ? `\n      <pubDate>${it.date.toUTCString()}</pubDate>` : ''}
     </item>`;
     })
     .join('\n');
@@ -213,17 +199,17 @@ function buildFeed(items, { selfUrl, filterDesc }) {
   return `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
   <channel>
-    <title>中国政府网 · 最新政策</title>
+    <title>订阅源 C</title>
     <link>${esc(PAGE_URL)}</link>
     <description>${esc(
-      `中国政府网「最新政策」栏目更新（按发稿时间倒序）${filterDesc ? '；' + filterDesc : ''}。数据源：${DATA_URL}`
+      `订阅源 C${filterDesc ? '；' + filterDesc : ''}`
     )}</description>
     <language>zh-CN</language>
     <lastBuildDate>${now.toUTCString()}</lastBuildDate>
     <pubDate>${newest.toUTCString()}</pubDate>
-    <generator>govcn-rss 1.0.0</generator>
+    <generator>rss 1.0.0</generator>
     <ttl>60</ttl>
-    <dc:creator>中国政府网</dc:creator>${selfUrl ? `\n    <atom:link href="${esc(selfUrl)}" rel="self" type="application/rss+xml" />` : ''}
+    ${selfUrl ? `\n    <atom:link href="${esc(selfUrl)}" rel="self" type="application/rss+xml" />` : ''}
 ${itemXml}
   </channel>
 </rss>
@@ -234,7 +220,7 @@ ${itemXml}
 function parseArgs(argv) {
   const opts = {
     limit: 50,
-    out: 'govcn-feed.xml',
+    out: 'feed-c.xml',
     since: null,
     filter: null,
     all: false,
@@ -243,7 +229,7 @@ function parseArgs(argv) {
     withContent: false,
     contentLimit: 20,
     contentMax: 12000,
-    contentCache: '.govcn-content-cache.json',
+    contentCache: '.s-c.json',
     refreshContent: false,
   };
   for (let i = 0; i < argv.length; i++) {
@@ -274,26 +260,24 @@ function parseArgs(argv) {
   return opts;
 }
 
-const HELP = `govcn-rss —— 中国政府网「最新政策」RSS 生成器
+const HELP = `gen-c.mjs
 
-用法: node govcn-rss.mjs [选项]
+用法: node gen-c.mjs [选项]
 
 选项:
-  --out <文件>       输出文件（默认 govcn-feed.xml）
-  --limit <n>        输出多少条（默认 50）
-  --all              输出全部（约 1100 条）
-  --since <日期>     只要该日期之后发布的，如 2026-01-01
-  --filter <正则>    标题过滤，如 "条例|办法"
-  --self <URL>       写入 atom:link rel="self"（托管后的地址）
-  --force            即使内容没变化也重写文件
-
-正文相关:
-  --with-content     抓取每篇公文的正文与元数据（发文机关/发文字号/主题分类）放进 item
-  --content-limit <n> 只抓前 n 条的正文（默认 20，0 = 全部命中项）
-  --content-max <n>  每条正文最多保留多少字符（默认 12000，0 = 不限）
-  --content-cache <文件> 正文缓存（默认 .govcn-content-cache.json），命中缓存不重复抓取
-  --refresh-content  忽略缓存重新抓正文
-  -h, --help         帮助
+  --out <文件>       输出文件（默认 feed-c.xml）
+  --limit <n>        输出条数（默认 50）
+  --all              输出全部
+  --since <日期>     该日期之后
+  --filter <正则>    标题过滤
+  --self <URL>       写入 atom:link self
+  --force            强制重写文件
+  --with-content     抓取正文与元数据
+  --content-limit <n> 前 n 条抓正文（默认 20）
+  --content-max <n>  每条正文字数上限（默认 12000）
+  --content-cache <文件> 正文缓存（默认 .s-c.json）
+  --refresh-content  忽略缓存
+  -h, --help
 `;
 
 /* ---------------- 主流程 ---------------- */

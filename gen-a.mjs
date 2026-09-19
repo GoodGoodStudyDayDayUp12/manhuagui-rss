@@ -1,17 +1,6 @@
 #!/usr/bin/env node
-/**
- * manhuagui-rss.mjs —— 把「看漫画」(manhuagui.com) 的漫画章节列表转成 RSS 2.0 订阅源
- *
- * 特点：零第三方依赖（只用 Node 内置模块），Node.js >= 18。
- *
- * 用法示例：
- *   node manhuagui-rss.mjs 45638                       # 生成 feed.xml
- *   node manhuagui-rss.mjs https://www.manhuagui.com/comic/45638/
- *   node manhuagui-rss.mjs 45638 --out my.xml --limit 20
- *   node manhuagui-rss.mjs 45638 --new-only            # 只输出上次之后的新章节
- *   node manhuagui-rss.mjs 45638 --serve --port 8931   # 常驻本地订阅服务
- *   node manhuagui-rss.mjs 45638 107 60387 --combined  # 多个漫画 + 合并订阅
- */
+// gen-a.mjs
+
 
 import https from 'node:https';
 import http from 'node:http';
@@ -294,16 +283,9 @@ export function buildFeed(
   const updated = parseSiteDate(comic.updatedAt);
   const lastBuild = new Date();
 
-  const descParts = [];
-  if (feedDesc) descParts.push(feedDesc);
-  else {
-    if (comic.intro) descParts.push(comic.intro);
-    if (comic.authors.length) descParts.push(`作者：${comic.authors.join('、')}`);
-    if (comic.serialStatus) descParts.push(`状态：${comic.serialStatus}`);
-    if (comic.updatedAt) descParts.push(`最近更新：${comic.updatedAt}${comic.latestChapterTitle ? `（${comic.latestChapterTitle}）` : ''}`);
-  }
+  const feedDescription = feedDesc || '订阅源 A';
 
-  const title = feedTitle || `${comic.title} - 漫画更新`;
+  const title = feedTitle || '订阅源 A';
   const ctx = { withIntro, withCover };
   const itemXml = picked.map((ch) => renderItem(comic, ch, updated, ctx)).join('\n');
 
@@ -312,12 +294,12 @@ export function buildFeed(
   <channel>
     <title>${esc(title)}</title>
     <link>${esc(comic.url)}</link>
-    <description>${esc(descParts.join('\n'))}</description>
+    <description>${esc(feedDescription)}</description>
     <language>zh-CN</language>
     <lastBuildDate>${lastBuild.toUTCString()}</lastBuildDate>${updated ? `\n    <pubDate>${updated.toUTCString()}</pubDate>` : ''}
-    <generator>manhuagui-rss ${VERSION}</generator>
+    <generator>rss ${VERSION}</generator>
     <ttl>60</ttl>
-    <dc:creator>manhuagui-rss</dc:creator>${comic.cover ? `\n    <image>\n      <url>${esc(comic.cover)}</url>\n      <title>${esc(comic.title)}</title>\n      <link>${esc(comic.url)}</link>\n    </image>` : ''}${selfUrl ? `\n    <atom:link href="${esc(selfUrl)}" rel="self" type="application/rss+xml" />` : ''}
+    <dc:creator>rss</dc:creator>${comic.cover ? `\n    <image>\n      <url>${esc(comic.cover)}</url>\n      <title>${esc(comic.title)}</title>\n      <link>${esc(comic.url)}</link>\n    </image>` : ''}${selfUrl ? `\n    <atom:link href="${esc(selfUrl)}" rel="self" type="application/rss+xml" />` : ''}
 ${itemXml}
   </channel>
 </rss>
@@ -453,7 +435,7 @@ function writeOutputs(results, comics, opts) {
   for (const r of results) {
     if (!r.xml) continue;
     const file = multi
-      ? path.join(opts.outdir, `manhuagui-${r.comic.id}.xml`)
+      ? path.join(opts.outdir, comics.length > 1 ? `feed-a-${r.comic.id}.xml` : 'feed-a.xml')
       : path.resolve(opts.out);
     fs.mkdirSync(path.dirname(file), { recursive: true });
     fs.writeFileSync(file, r.xml, 'utf8');
@@ -469,7 +451,7 @@ function writeOutputs(results, comics, opts) {
       items.push(...parsed);
     }
     items.sort((a, b) => (b.date?.getTime() || 0) - (a.date?.getTime() || 0));
-    const file = path.join(opts.outdir, 'manhuagui-all.xml');
+    const file = path.join(opts.outdir, 'feed-b.xml');
     fs.writeFileSync(file, buildCombinedFeed(ok.map((r) => r.comic), items, opts), 'utf8');
     written.push(file);
     console.log(`[write] ${file}（合并 ${ok.length} 部漫画）`);
@@ -500,12 +482,12 @@ function buildCombinedFeed(comics, items, opts) {
   return `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
   <channel>
-    <title>看漫画 更新订阅（${esc(titles)}）</title>
+    <title>订阅源 B</title>
     <link>${esc(SITE)}</link>
-    <description>${esc(`合并订阅：${titles}`)}</description>
+    <description>订阅源 B</description>
     <language>zh-CN</language>
     <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>
-    <generator>manhuagui-rss ${VERSION}</generator>
+    <generator>rss ${VERSION}</generator>
     <ttl>60</ttl>${selfUrl ? `\n    <atom:link href="${esc(selfUrl)}" rel="self" type="application/rss+xml" />` : ''}
 ${items.map((i) => i.xml).join('\n')}
   </channel>
@@ -670,11 +652,11 @@ function loadConfigFile(file) {
 function parseArgs(argv) {
   const opts = {
     comics: [],
-    out: 'feed.xml',
+    out: 'feed-a.xml',
     outdir: '.',
     outdirExplicit: false,
     limit: 100,
-    state: '.manhuagui-rss-state.json',
+    state: '.s-a.json',
     newOnly: false,
     combined: false,
     withCover: false,
@@ -728,44 +710,25 @@ function parseArgs(argv) {
   return opts;
 }
 
-const HELP = `manhuagui-rss ${VERSION} —— 看漫画(manhuagui.com) 漫画更新 RSS 生成器
+const HELP = `gen-a.mjs
 
-用法:
-  node manhuagui-rss.mjs <漫画ID或链接> [更多漫画...] [选项]
-  node manhuagui-rss.mjs --config feeds.json
+用法: node gen-a.mjs [ID或链接...] [选项]
+      node gen-a.mjs --config config.json
 
 选项:
-  --config <文件>    从 JSON 配置文件读取漫画列表与选项（命令行参数优先级更高）
-  --out <文件>       单个漫画的输出文件（默认 feed.xml）
-  --outdir <目录>    多漫画时的输出目录与合并源目录（默认当前目录）
-  --limit <n>        每个源最多输出多少条（默认 100，0 表示全部）
-  --new-only         只输出状态文件中未出现过的新章节（首次运行输出全部）
-  --with-intro       在每条 item 的简介里附带漫画内容简介（体积更大）
-  --with-cover       在每条 item 里嵌入漫画封面图（阅读器里显示缩略图）
-  --state <文件>     状态文件路径（默认 .manhuagui-rss-state.json）
-  --combined         多漫画时额外生成 manhuagui-all.xml 合并订阅
-  --serve            启动本地 RSS 服务（默认 http://127.0.0.1:8931/feed.xml）
-  --port <n>         服务端口（默认 8931）
-  --interval <分钟>  服务模式下的抓取间隔（默认 30）
-  --self <URL>       覆盖 atom:link 的 self 地址
-  --retries <n>      抓取失败重试次数（默认 3）
-  --timeout <秒>     单次请求超时（默认 20 秒）
-
-示例:
-  node manhuagui-rss.mjs 45638
-  node manhuagui-rss.mjs https://www.manhuagui.com/comic/45638/ --limit 30 --out 备胎女友.xml
-  node manhuagui-rss.mjs 45638 --serve --port 8931
-  node manhuagui-rss.mjs 45638 107 --combined --outdir feeds
-  node manhuagui-rss.mjs --config feeds.json
-
-配置文件 feeds.json 示例:
-  {
-    "comics": ["45638", "107"],
-    "outdir": ".",
-    "limit": 100,
-    "combined": true,
-    "state": ".feed-state.json"
-  }
+  --config <文件>   配置文件
+  --out <文件>      单个源输出（默认 feed-a.xml）
+  --outdir <目录>   多源输出目录
+  --limit <n>       条数（默认 100，0=全部）
+  --new-only        只输出新增项
+  --state <文件>    状态文件（默认 .s-a.json）
+  --combined        额外生成合并源 feed-b.xml
+  --with-cover      条目内嵌封面图
+  --with-intro      条目内附简介
+  --serve / --port / --interval   本地服务
+  --self <URL>      写入 atom:link self
+  --retries <n> / --timeout <秒>
+  -h, --help
 `;
 
 async function main() {
@@ -788,7 +751,7 @@ async function main() {
   }
 }
 
-if (import.meta.url === `file://${process.argv[1].replace(/\\/g, '/')}` || process.argv[1]?.endsWith('manhuagui-rss.mjs')) {
+if (import.meta.url === `file://${process.argv[1].replace(/\\/g, '/')}` || process.argv[1]?.endsWith('gen-a.mjs')) {
   main().catch((e) => {
     console.error('运行失败：' + e.message);
     process.exit(1);

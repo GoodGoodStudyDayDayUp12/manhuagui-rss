@@ -5,6 +5,6 @@
   "outdir": ".",
   "limit": 100,
   "combined": true,
-  "state": ".feed-state.json",
+  "state": ".s-a.json",
   "withCover": true
 }
