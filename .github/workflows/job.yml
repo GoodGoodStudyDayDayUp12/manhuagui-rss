@@ -14,13 +14,15 @@ concurrency:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    # 固定版本，避免 ubuntu-latest 迁移带来的意外
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
-          node-version: '20'
+          node-version: '22'
 
       - name: run a
         run: |
@@ -53,9 +55,29 @@ jobs:
         run: |
           git config user.name  "bot"
           git config user.email "bot@users.noreply.github.com"
+
+          # 远端可能已被上一次运行或本地推送推进，先把工作区对齐到远端最新，
+          # 再基于它提交，避免 non-fast-forward 导致 push 失败
+          if git fetch origin "${GITHUB_REF_NAME}" --depth=1; then
+            git reset --soft FETCH_HEAD
+          fi
+
           git add -A -- '*.xml' '.s-a.json' '.s-c.json'
           if git diff --cached --quiet; then
+            echo "no change"
             exit 0
           fi
           git commit -m "update"
-          git push
+
+          # 万一仍然被拒（例如刚好有人同时推送），退一步重取远端再推一次
+          if ! git push; then
+            git fetch origin "${GITHUB_REF_NAME}"
+            git reset --soft FETCH_HEAD
+            git add -A -- '*.xml' '.s-a.json' '.s-c.json'
+            if git diff --cached --quiet; then
+              echo "no change"
+              exit 0
+            fi
+            git commit -m "update"
+            git push
+          fi
