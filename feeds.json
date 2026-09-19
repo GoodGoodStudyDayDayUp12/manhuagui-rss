@@ -1,0 +1,9 @@
+{
+  "comics": [
+    "45638"
+  ],
+  "outdir": ".",
+  "limit": 100,
+  "combined": true,
+  "state": ".feed-state.json"
+}
