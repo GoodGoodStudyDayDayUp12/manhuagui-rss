@@ -121,6 +121,18 @@ jobs:
           echo "::warning::run h failed"
           exit 1
 
+      - name: run i
+        continue-on-error: true
+        run: |
+          for i in 1 2 3; do
+            if node gen-i.mjs --config config-i.json; then
+              exit 0
+            fi
+            sleep 60
+          done
+          echo "::warning::run i failed"
+          exit 1
+
       - name: check
         run: |
           for f in *.xml; do

@@ -49,6 +49,8 @@ node "%~dp0gen-g.mjs" --out feed-g.xml --limit 100 --with-content --content-limi
 if errorlevel 1 echo    [warn] g failed
 node "%~dp0gen-d.mjs" --mid 3493278460676126 --title "¶©ÔÄÔ´ H" --out feed-h.xml --limit 30 --self "https://cdn.jsdelivr.net/gh/%GHUSER%/%GHREPO%@main/feed-h.xml"
 if errorlevel 1 echo    [warn] h failed
+node "%~dp0gen-i.mjs" --config config-i.json
+if errorlevel 1 echo    [warn] i failed
 
 echo 2/3
 git fetch origin main >nul 2>nul

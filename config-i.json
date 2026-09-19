@@ -1,0 +1,35 @@
+{
+  "feeds": [
+    {
+      "keyword": "肯德基",
+      "out": "feed-i.xml",
+      "self": "https://cdn.jsdelivr.net/gh/GoodGoodStudyDayDayUp12/manhuagui-rss@main/feed-i.xml"
+    },
+    {
+      "keyword": "麦当劳",
+      "out": "feed-j.xml",
+      "self": "https://cdn.jsdelivr.net/gh/GoodGoodStudyDayDayUp12/manhuagui-rss@main/feed-j.xml"
+    },
+    {
+      "keyword": "美团",
+      "out": "feed-k.xml",
+      "self": "https://cdn.jsdelivr.net/gh/GoodGoodStudyDayDayUp12/manhuagui-rss@main/feed-k.xml"
+    },
+    {
+      "keyword": "牛肉",
+      "out": "feed-l.xml",
+      "self": "https://cdn.jsdelivr.net/gh/GoodGoodStudyDayDayUp12/manhuagui-rss@main/feed-l.xml"
+    },
+    {
+      "keyword": "羊肉",
+      "out": "feed-m.xml",
+      "self": "https://cdn.jsdelivr.net/gh/GoodGoodStudyDayDayUp12/manhuagui-rss@main/feed-m.xml"
+    },
+    {
+      "_note": "zhekou.manmanbuy.com/search/cf11/0/0/0/1 打开时是人机验证（JS VM 校验）页，无法在不解验证的前提下抓取，故未启用",
+      "url": "https://zhekou.manmanbuy.com/search/cf11/0/0/0/1",
+      "out": "feed-n.xml",
+      "enabled": false
+    }
+  ]
+}
