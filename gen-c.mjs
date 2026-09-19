@@ -114,6 +114,9 @@ function sliceDiv(html, startIdx) {
   return html.slice(startIdx);
 }
 
+/** 清洗规则版本：改动清洗逻辑时 +1，缓存里版本不一致会自动重抓，无需手动清缓存 */
+const SANITIZER_VERSION = 2;
+
 /** 清洗正文：只保留基本排版标签（加粗、标题、列表、表格、链接、图片），去掉所有属性里的样式类名 */
 const KEEP_TAGS = new Set([
   'p', 'br', 'hr', 'strong', 'b', 'em', 'i', 'u', 's', 'sub', 'sup',
@@ -164,8 +167,22 @@ function sanitizeContent(raw) {
 
   // 开头若残留无标签文字，包进 <p>
   if (s && !s.startsWith('<')) s = '<p>' + s;
+
+  // 小标题升级为块级标题标签：部分阅读器会丢掉行内 <strong>，但标题标签一定按粗体渲染
+  s = s.replace(/<p>\s*<strong>([^<]{1,80})<\/strong>([\s\S]*?)<\/p>/g, (m, strongText, rest) => {
+    const t = strongText.trim();
+    const body = rest.trim();
+    if (isSectionHeading(t)) return body ? `<h4>${t}</h4><p>${body}</p>` : `<h4>${t}</h4>`;
+    if (!body) return `<h3>${t}</h3>`; // 整段只有一句加粗：当作标题行（文号/发文机关标题等）
+    return m; // 段落中间的加粗照旧
+  });
+
   return s;
 }
+
+/** 判断一段加粗文字是不是公文里的小标题（一、 / （一） / 1. 开头） */
+const isSectionHeading = (t) =>
+  /^([一二三四五六七八九十百]+[、.．]|（[一二三四五六七八九十百]+）|\([一二三四五六七八九十百]+\)|\d+[、.．])/.test(t);
 
 /** 纯文本长度（用于截断判断） */
 const textLength = (html) => decodeEntities(html.replace(/<[^>]+>/g, '')).replace(/\s+/g, ' ').trim().length;
@@ -402,8 +419,8 @@ const HELP = `gen-c.mjs
     for (let i = 0; i < n; i++) {
       const it = items[i];
       const hit = cache[it.url];
-      // 旧版缓存里存的是纯文本段落，没有 contentHtml，视为未命中以便重新抓取带排版的版本
-      if (hit && !opts.refreshContent && typeof hit.contentHtml === 'string') {
+      // 旧版缓存（纯文本 / 旧清洗规则）视为未命中，自动重抓带排版的版本
+      if (hit && !opts.refreshContent && typeof hit.contentHtml === 'string' && hit.v === SANITIZER_VERSION) {
         it.meta = hit.meta || {};
         it.contentHtml = hit.contentHtml;
         fromCache++;
@@ -414,12 +431,17 @@ const HELP = `gen-c.mjs
         const art = extractArticle(html);
         it.meta = art.meta;
         it.contentHtml = art.contentHtml;
-        cache[it.url] = { fetchedAt: new Date().toISOString(), meta: art.meta, contentHtml: art.contentHtml };
+        cache[it.url] = {
+          fetchedAt: new Date().toISOString(),
+          v: SANITIZER_VERSION,
+          meta: art.meta,
+          contentHtml: art.contentHtml,
+        };
         fetched++;
         console.log(
           `  ${String(i + 1).padStart(3)}/${n} ✓ ${textLength(art.contentHtml)} 字 / 加粗 ${
             (art.contentHtml.match(/<(strong|b)>/g) || []).length
-          } 处  ${it.title.slice(0, 30)}`
+          } 处 / 标题 ${(art.contentHtml.match(/<h[1-6]>/g) || []).length} 个  ${it.title.slice(0, 26)}`
         );
       } catch (e) {
         failed++;
