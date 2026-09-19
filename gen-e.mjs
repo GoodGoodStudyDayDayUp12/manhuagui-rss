@@ -37,10 +37,13 @@ import {
   saveContentCache,
   pruneCache,
   unchangedFile,
+  absolutizeUrls,
 } from './lib.mjs';
 
 const PAGE_URL = 'http://finance.people.com.cn/GB/70846/index.html';
 const ORIGIN = 'http://finance.people.com.cn';
+// 本站缓存版本：正文抽取规则（尤其图片挑选取舍）变化时 +1，旧缓存自动失效
+const CACHE_VERSION = SANITIZER_VERSION * 10 + 3;
 const UA =
   'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36';
 
@@ -128,6 +131,53 @@ function parseList(html) {
 }
 
 /* ---------------- 正文抽取 ---------------- */
+
+// 站点内的推广图/图标特征：公众号二维码、扫一扫、客户端下载、分享、导航图标等
+const BAD_IMG_SRC = /(?:\/img\/|\/static\/|\/images\/|logo|icon|share|arrow|spacer|blank|look\.png|qrcode|erweima|download)/i;
+const BAD_IMG_ALT = /(?:公众号|二维码|扫一扫|关注|下载|客户端|分享|微信|微博)/;
+const BAD_IMG_CLASS = /(?:tjewm|rmwApp|app-bot|share_con|rm_ranking|hot_con|nav|footer|paper_num)/i;
+
+/** 判断某个 img 是不是正文照片（而不是页面图标/推广图） */
+function isArticleImg(tag, before = '') {
+  const src = (tag.match(/src=["']([^"']+)["']/i) || [])[1] || '';
+  if (!src) return false;
+  const alt = (tag.match(/alt=["']([^"']*)["']/i) || [])[1] || '';
+  if (BAD_IMG_SRC.test(src) || BAD_IMG_ALT.test(alt)) return false;
+  if (!/(?:NMediaFile|\/n1\/|MAIN|\.jpe?g|\.png|\.gif)(?:$|\?)/i.test(src)) return false;
+  // 看它最近所在的容器 class
+  const cls = ([...String(before).matchAll(/<div[^>]*class="([^"]{0,80})"/g)].pop() || [])[1] || '';
+  if (BAD_IMG_CLASS.test(cls)) return false;
+  return true;
+}
+
+/** 从候选位置挑正文主图；挑不到就返回 null（宁可不放图，也不放错图） */
+function pickLeadImage(html, contentIdx) {
+  const head = contentIdx > -1 ? html.slice(0, contentIdx) : html;
+  const scope = head.length > 20000 ? head.slice(-20000) : head; // 只看正文附近，避免页头/侧栏
+
+  // ① 最可靠：图注 <div class="text_show_img"> 前面紧挨着的那张图
+  const capIdx = scope.search(/<div class="text_show_img"/i);
+  if (capIdx > -1) {
+    const seg = scope.slice(0, capIdx);
+    const imgs = [...seg.matchAll(/<img[^>]+>/gi)];
+    for (let k = imgs.length - 1; k >= 0 && k >= imgs.length - 4; k--) {
+      const tag = imgs[k][0];
+      if (isArticleImg(tag, seg.slice(0, imgs[k].index))) return tag;
+    }
+  }
+
+  // ② 其次：lypic 容器（该站的正文图片容器）
+  const ly = scope.lastIndexOf('lypic');
+  if (ly > -1) {
+    const seg = scope.slice(ly);
+    for (const m of seg.matchAll(/<img[^>]+>/gi)) {
+      if (isArticleImg(m[0], seg.slice(0, m.index))) return m[0];
+    }
+  }
+
+  return null;
+}
+
 function extractArticle(html, { withLead = true } = {}) {
   const meta = {};
   const dm = html.match(/(\d{4})年(\d{1,2})月(\d{1,2})日\s*(\d{2}:\d{2})/);
@@ -135,34 +185,23 @@ function extractArticle(html, { withLead = true } = {}) {
   const sm = html.match(/来源：\s*([^<\s|]{2,20})/);
   if (sm) meta.source = cleanText(sm[1]);
 
-  // 正文之前的主图与图注（排除图标/分享图）
+  const contentIdx = html.indexOf('rm_txt_con');
+
+  // 正文之前的主图与图注
   let lead = '';
   if (withLead) {
-    const contentIdx = html.indexOf('rm_txt_con');
-    const head = contentIdx > -1 ? html.slice(0, contentIdx) : html;
-    const pickFrom = (scope) => {
-      for (const m of scope.matchAll(/<img[^>]+>/gi)) {
-        const tag = m[0];
-        const src = (tag.match(/src=["']([^"']+)["']/i) || [])[1] || '';
-        if (!src) continue;
-        if (/(?:\/static\/|\/img\/|\/images\/|logo|icon|share|look\.png|blank\.|arrow|spacer)/i.test(src)) continue;
-        if (!/(?:NMediaFile|MAIN|\/n1\/|\.jpe?g|\.png|\.gif)(?:$|\?)/i.test(src)) continue;
-        return { src, alt: cleanText((tag.match(/alt=["']([^"']*)["']/i) || [])[1] || '') };
-      }
-      return null;
-    };
-    const img = pickFrom(head) || pickFrom(html);
-    if (img) {
-      const raw = img.src;
+    const tag = pickLeadImage(html, contentIdx);
+    if (tag) {
+      const raw = (tag.match(/src=["']([^"']+)["']/i) || [])[1] || '';
       const src = raw.startsWith('//') ? 'https:' + raw : /^https?:/i.test(raw) ? raw : ORIGIN + (raw.startsWith('/') ? '' : '/') + raw;
+      const alt = cleanText((tag.match(/alt=["']([^"']*)["']/i) || [])[1] || '');
       lead =
-        `<p><img src="${esc(src)}"${img.alt ? ` alt="${esc(img.alt)}"` : ''}/></p>` +
-        (img.alt ? `<p>${esc(img.alt)}</p>` : '');
+        `<p><img src="${esc(src)}"${alt ? ` alt="${esc(alt)}"` : ''}/></p>` + (alt ? `<p>${esc(alt)}</p>` : '');
     }
   }
 
-  const i = html.indexOf('rm_txt_con');
-  if (i === -1) return { meta, contentHtml: lead, nextUrl: null };
+  const i = contentIdx;
+  if (i === -1) return { meta, contentHtml: lead, bodyHtml: '', nextUrl: null };
 
   let block = sliceDiv(html, html.lastIndexOf('<div', i));
   // 去掉“责编/分享”那一段
@@ -171,7 +210,10 @@ function extractArticle(html, { withLead = true } = {}) {
   const nextM = html.match(/<a[^>]+href=["']([^"']+)["'][^>]*id=["']next["']/i) ||
     html.match(/<a[^>]+id=["']next["'][^>]*href=["']([^"']+)["']/i);
 
-  const bodyHtml = sanitizeContent(block);
+  // 正文里也可能混入二维码/推广图/分享图标，一并剔除
+  let bodyHtml = absolutizeUrls(sanitizeContent(block), ORIGIN).replace(/<img[^>]*\/?>/gi, (tag) =>
+    isArticleImg(tag) ? tag : ''
+  );
   return { meta, contentHtml: lead + bodyHtml, bodyHtml, nextUrl: nextM ? nextM[1] : null };
 }
 
@@ -359,7 +401,7 @@ const HELP = `gen-e.mjs
     for (let i = 0; i < n; i++) {
       const it = items[i];
       const hit = cache[it.url];
-      if (hit && !opts.refreshContent && typeof hit.contentHtml === 'string' && hit.v === SANITIZER_VERSION) {
+      if (hit && !opts.refreshContent && typeof hit.contentHtml === 'string' && hit.v === CACHE_VERSION) {
         it.meta = hit.meta || {};
         it.contentHtml = hit.contentHtml;
         fromCache++;
@@ -371,7 +413,7 @@ const HELP = `gen-e.mjs
         it.contentHtml = art.contentHtml;
         cache[it.url] = {
           fetchedAt: new Date().toISOString(),
-          v: SANITIZER_VERSION,
+          v: CACHE_VERSION,
           meta: art.meta,
           contentHtml: art.contentHtml,
         };

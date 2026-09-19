@@ -30,7 +30,14 @@ export const decodeEntities = (s) =>
     .replace(/&nbsp;/g, ' ')
     .replace(/&amp;/g, '&');
 
-export const cleanText = (s) => decodeEntities(String(s).replace(/<[^>]+>/g, ' ')).replace(/[ \t\u00a0]+/g, ' ').trim();
+/** 去掉 XML 非法控制字符与零宽字符（页面上常见的隐形垃圾，会让 RSS 校验失败） */
+export const stripInvisible = (s) =>
+  String(s ?? '')
+    .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, '')
+    .replace(/[\u200B-\u200D\uFEFF]/g, '');
+
+export const cleanText = (s) =>
+  stripInvisible(decodeEntities(String(s).replace(/<[^>]+>/g, ' '))).replace(/[ \t\u00a0]+/g, ' ').trim();
 
 /* ---------------- HTML 切片 ---------------- */
 /** 从 startIdx（指向 <div）开始按 div 深度截取整个元素 */
@@ -55,13 +62,14 @@ export function sliceDiv(html, startIdx) {
 
 /* ---------------- 正文清洗 ---------------- */
 /** 清洗规则版本：改动清洗逻辑时 +1，缓存里版本不一致会自动重抓 */
-export const SANITIZER_VERSION = 2;
+export const SANITIZER_VERSION = 3;
 
 const KEEP_TAGS = new Set([
   'p', 'br', 'hr', 'strong', 'b', 'em', 'i', 'u', 's', 'sub', 'sup',
   'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
   'ul', 'ol', 'li', 'blockquote',
   'table', 'thead', 'tbody', 'tfoot', 'tr', 'td', 'th',
+  'pre', 'code',
   'a', 'img',
 ]);
 const VOID_TAGS = new Set(['br', 'hr', 'img']);
@@ -116,7 +124,20 @@ export function sanitizeContent(raw) {
     return m;
   });
 
-  return s;
+  return stripInvisible(s);
+}
+
+/** 把 HTML 里的相对链接/图片地址补成绝对地址（阅读器无法解析相对路径） */
+export function absolutizeUrls(html, origin) {
+  return String(html ?? '').replace(/\s(href|src)="([^"]*)"/gi, (m, attr, url) => {
+    const u = url.trim();
+    if (!u || /^(?:https?:|mailto:|data:|#|\/\/)/i.test(u)) {
+      if (u.startsWith('//')) return ` ${attr}="https:${u}"`;
+      return m;
+    }
+    const abs = origin + (u.startsWith('/') ? '' : '/') + u;
+    return ` ${attr}="${abs}"`;
+  });
 }
 
 /** 纯文本长度（用于截断判断） */

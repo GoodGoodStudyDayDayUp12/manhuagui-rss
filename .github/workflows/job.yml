@@ -70,13 +70,26 @@ jobs:
         run: |
           for i in 1 2 3; do
             if node gen-e.mjs --out feed-e.xml --limit 50 --with-content --content-limit 20 \
-                 --guid-version 1 \
+                 --guid-version 2 \
                  --self "https://cdn.jsdelivr.net/gh/${{ github.repository }}@main/feed-e.xml"; then
               exit 0
             fi
             sleep 60
           done
           echo "::warning::run e failed"
+          exit 1
+
+      - name: run f
+        continue-on-error: true
+        run: |
+          for i in 1 2 3; do
+            if node gen-f.mjs --out feed-f.xml --limit 30 \
+                 --self "https://cdn.jsdelivr.net/gh/${{ github.repository }}@main/feed-f.xml"; then
+              exit 0
+            fi
+            sleep 60
+          done
+          echo "::warning::run f failed"
           exit 1
 
       - name: check

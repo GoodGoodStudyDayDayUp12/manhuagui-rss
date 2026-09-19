@@ -9,7 +9,8 @@
 //   --limit <n>        输出条数（默认 30，接口每页 30 条）
 //   --self <URL>       写入 atom:link self
 //   --guid-version <v> 给条目 GUID 加版本号
-//   --attempts <n>     整体重试次数（默认 3）
+//   --attempts <n>     整体重试次数（默认 3，仅用于网络类失败）
+//                    命中风控时直接跳过本轮（保留上次内容），不重试
 //   --force            内容没变也重写文件
 //   -h, --help
 
@@ -43,6 +44,17 @@ function encWbi(params, imgKey, subKey) {
   return `${query}&w_rid=${md5(query + mixinKey)}`;
 }
 
+/* ---------------- 风控识别 ---------------- */
+// 命中就直接跳过本次更新（保留上一次的订阅内容），不再重试：重试只会让风控时间更长
+const RISK_HTTP = new Set([412, 403]);
+const RISK_CODES = new Set([-352, -412]);
+
+const riskError = (msg) => {
+  const e = new Error(msg);
+  e.risk = true;
+  return e;
+};
+
 /* ---------------- HTTP ---------------- */
 function httpGet(url, cookie = '', { retries = 2, base = 5000 } = {}) {
   const once = () =>
@@ -62,6 +74,10 @@ function httpGet(url, cookie = '', { retries = 2, base = 5000 } = {}) {
           },
         },
         (res) => {
+          if (RISK_HTTP.has(res.statusCode)) {
+            res.resume();
+            return reject(riskError(`HTTP ${res.statusCode}（风控）`));
+          }
           if (res.statusCode !== 200) {
             res.resume();
             return reject(new Error(`HTTP ${res.statusCode}`));
@@ -82,7 +98,7 @@ function httpGet(url, cookie = '', { retries = 2, base = 5000 } = {}) {
         return await once();
       } catch (e) {
         last = e;
-        // 412 是风控，间隔要拉长，否则越试越被封
+        if (e.risk) throw e; // 风控不重试，立刻上抛
         if (i < retries) await sleep(base * (i + 1));
       }
     }
@@ -128,7 +144,10 @@ async function fetchVideosOnce(mid, want, cookie, keys) {
     };
     const body = await httpGet(`${API}/x/space/wbi/arc/search?${encWbi(params, keys.imgKey, keys.subKey)}`, cookie);
     const j = JSON.parse(body);
-    if (j.code !== 0) throw new Error(`接口 code=${j.code} ${j.message || ''}`);
+    if (j.code !== 0) {
+      if (RISK_CODES.has(j.code)) throw riskError(`接口 code=${j.code} ${j.message || '风控校验失败'}`);
+      throw new Error(`接口 code=${j.code} ${j.message || ''}`);
+    }
     const list = j.data?.list?.vlist || [];
     if (!list.length) break;
     out.push(...list);
@@ -139,7 +158,7 @@ async function fetchVideosOnce(mid, want, cookie, keys) {
   return out.slice(0, want);
 }
 
-/** 整体重试：每次重新取 cookie 和 WBI 密钥，间隔递增，降低被风控概率 */
+/** 整体重试：每次重新取 cookie 和 WBI 密钥，间隔递增；遇到风控立刻放弃，不做无谓重试 */
 async function fetchVideos(mid, want, attempts) {
   let lastErr;
   for (let a = 1; a <= attempts; a++) {
@@ -150,6 +169,7 @@ async function fetchVideos(mid, want, attempts) {
       await sleep(1500);
       return await fetchVideosOnce(mid, want, cookie, keys);
     } catch (e) {
+      if (e.risk) throw e; // 风控：直接跳过，不再重试
       lastErr = e;
       if (a < attempts) {
         const wait = 15000 * a;
@@ -264,7 +284,8 @@ const HELP = `gen-d.mjs
   --limit <n>        输出条数（默认 30）
   --self <URL>       写入 atom:link self
   --guid-version <v> 给条目 GUID 加版本号
-  --attempts <n>     整体重试次数（默认 3）
+  --attempts <n>     整体重试次数（默认 3，仅用于网络类失败）
+//                    命中风控时直接跳过本轮（保留上次内容），不重试
   --force            内容没变也重写文件
   -h, --help
 `;
@@ -314,6 +335,11 @@ const HELP = `gen-d.mjs
   console.log(`最新：${videos[0].dateRaw} ${videos[0].title.slice(0, 36)}`);
   console.log(`已写入 ${opts.out}（${videos.length} 条，${(xml.length / 1024).toFixed(1)} KB）`);
 })().catch((e) => {
+  if (e.risk) {
+    // 风控命中：当作“本轮跳过”，以成功状态退出，保留上一次的订阅内容，等下一轮再试
+    console.log(`[跳过] ${e.message} —— 本轮不更新，保留上次内容，等下一轮再试`);
+    process.exit(0);
+  }
   console.error('运行失败：' + e.message);
   process.exit(1);
 });
