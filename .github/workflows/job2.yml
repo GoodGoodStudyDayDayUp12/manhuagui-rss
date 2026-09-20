@@ -68,8 +68,18 @@ jobs:
             git reset --soft FETCH_HEAD
           fi
 
-          # 只提交这两个文件，避免覆盖主任务正在更新的其它源
-          git add -A -- 'feed-d.xml' 'feed-h.xml'
+          # 只提交这两个文件，避免覆盖主任务正在更新的其它源。
+          # 注意：某个文件不存在时（例如命中风控跳过了本轮）不能直接写进 pathspec，
+          # 否则 git add 会报 "pathspec did not match" 并中断整个步骤。
+          add_existing() {
+            for f in feed-d.xml feed-h.xml; do
+              if [ -f "$f" ]; then
+                git add -A -- "$f"
+              fi
+            done
+          }
+
+          add_existing
           if git diff --cached --quiet; then
             echo "no change"
             exit 0
@@ -79,7 +89,7 @@ jobs:
           if ! git push; then
             git fetch origin "${GITHUB_REF_NAME}"
             git reset --soft FETCH_HEAD
-            git add -A -- 'feed-d.xml' 'feed-h.xml'
+            add_existing
             if git diff --cached --quiet; then
               echo "no change"
               exit 0
