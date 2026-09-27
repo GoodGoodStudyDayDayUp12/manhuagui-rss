@@ -156,7 +156,7 @@ function renderItem(it, guidVersion) {
     </item>`;
 }
 
-function buildFeed(deals, { selfUrl, guidVersion, limit, pageUrl }) {
+function buildFeed(deals, { selfUrl, guidVersion, limit, pageUrl, title }) {
   const now = new Date();
   const newest = deals[0]?.date || now;
   const rendered = deals.map((it) => renderItem(it, guidVersion));
@@ -164,9 +164,9 @@ function buildFeed(deals, { selfUrl, guidVersion, limit, pageUrl }) {
   return `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
   <channel>
-    <title>订阅源 I</title>
+    <title>${esc(title || '订阅源 I')}</title>
     <link>${esc(pageUrl)}</link>
-    <description>订阅源 I</description>
+    <description>${esc(title || '订阅源 I')}</description>
     <language>zh-CN</language>
     <lastBuildDate>${now.toUTCString()}</lastBuildDate>
     <pubDate>${newest.toUTCString()}</pubDate>
@@ -191,6 +191,7 @@ function parseArgs(argv) {
     history: true,
     self: null,
     guidVersion: '',
+    title: '订阅源 I',
     force: false,
     help: false,
   };
@@ -206,6 +207,7 @@ function parseArgs(argv) {
       case '--keyword': opts.keyword = next(); break;
       case '--url': opts.url = next(); break;
       case '--out': opts.out = next(); break;
+      case '--title': opts.title = next(); break;
       case '--limit': opts.limit = Number(next()); break;
       case '--pages': opts.pages = Number(next()); break;
       case '--max-items': opts.maxItems = Number(next()); break;
@@ -229,6 +231,7 @@ const HELP = `gen-i.mjs
 //   --keyword <词>     搜索关键词（默认 肯德基）
   --url <地址>       直接指定完整搜索地址
   --out <文件>       输出文件（默认 feed-i.xml）
+  --title <名称>     频道标题（默认 订阅源 I）
   --limit <n>        输出条数（默认 100）
   --pages <n>        抓前 n 页（默认 1）
   --max-items <n>    合并历史后总条数上限（默认 300）
@@ -277,6 +280,7 @@ async function runOne(opts) {
     guidVersion: opts.guidVersion,
     limit: opts.limit,
     pageUrl: pageUrlFor(opts, 1),
+    title: opts.title,
   });
   if (opts.history) xml = mergeHistoryIntoXml(xml, opts.out, { maxItems: opts.maxItems });
 
@@ -312,6 +316,7 @@ async function runOne(opts) {
         keyword: f.keyword ?? opts.keyword,
         url: f.url ?? null,
         out: f.out ? path.resolve(base, f.out) : opts.out,
+        title: f.title ?? opts.title,
         limit: f.limit ?? opts.limit,
         pages: f.pages ?? opts.pages,
         maxItems: f.maxItems ?? opts.maxItems,

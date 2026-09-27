@@ -3,30 +3,35 @@
     {
       "keyword": "肯德基",
       "out": "feed-i.xml",
+      "title": "订阅源 I",
       "pages": 3,
       "self": "https://cdn.jsdelivr.net/gh/GoodGoodStudyDayDayUp12/manhuagui-rss@main/feed-i.xml"
     },
     {
       "keyword": "麦当劳",
       "out": "feed-j.xml",
+      "title": "订阅源 J",
       "pages": 3,
       "self": "https://cdn.jsdelivr.net/gh/GoodGoodStudyDayDayUp12/manhuagui-rss@main/feed-j.xml"
     },
     {
       "keyword": "美团",
       "out": "feed-k.xml",
+      "title": "订阅源 K",
       "pages": 3,
       "self": "https://cdn.jsdelivr.net/gh/GoodGoodStudyDayDayUp12/manhuagui-rss@main/feed-k.xml"
     },
     {
       "keyword": "牛肉",
       "out": "feed-l.xml",
+      "title": "订阅源 L",
       "pages": 3,
       "self": "https://cdn.jsdelivr.net/gh/GoodGoodStudyDayDayUp12/manhuagui-rss@main/feed-l.xml"
     },
     {
       "keyword": "羊肉",
       "out": "feed-m.xml",
+      "title": "订阅源 M",
       "pages": 3,
       "self": "https://cdn.jsdelivr.net/gh/GoodGoodStudyDayDayUp12/manhuagui-rss@main/feed-m.xml"
     },
