@@ -107,9 +107,9 @@ jobs:
 
       - name: check
         run: |
-          for f in *.xml; do
-            python3 -c "import xml.dom.minidom; xml.dom.minidom.parse('$f')"
-          done
+          # 结构自检（XML 完整性 / 控制字符 / 未转义的 & / guid 重复）
+          # 同时防止条目数比仓库里的版本变少，避免历史条目被覆盖丢失
+          node check.mjs
 
       - name: push
         run: |
@@ -141,3 +141,11 @@ jobs:
             git commit -m "update"
             git push
           fi
+
+      - name: status
+        if: always()
+        continue-on-error: true
+        run: |
+          # 只做提示、不阻断任务：列出每个源的条数与最后构建时间，
+          # 并给超过 48 小时没更新的源打 warning 注解（例如 B 站风控导致停更）
+          node check.mjs --max-age 48

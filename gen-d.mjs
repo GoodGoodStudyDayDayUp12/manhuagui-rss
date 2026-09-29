@@ -13,12 +13,14 @@
 //   --attempts <n>     整体重试次数（默认 3，仅用于网络类失败）
 //                    命中风控时直接跳过本轮（保留上次内容），不重试
 //   --force            内容没变也重写文件
+//   --no-history       不与已有输出合并历史条目
+//   --max-items <n>    历史合并后的条目上限（默认 300）
 //   -h, --help
 
 import https from 'node:https';
 import crypto from 'node:crypto';
 import fs from 'node:fs';
-import { mergeHistoryIntoXml } from './lib.mjs';
+import { cdata, esc, guidFields, rssChannel, sleep, stripTags, writeFeedOutput } from './lib.mjs';
 
 const MID_DEFAULT = '3493080468556379';
 const API = 'https://api.bilibili.com';
@@ -26,7 +28,6 @@ const UA =
   'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36';
 const PAGE_SIZE = 30;
 
-const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const md5 = (s) => crypto.createHash('md5').update(s).digest('hex');
 
 /* ---------------- WBI 签名 ---------------- */
@@ -56,6 +57,16 @@ const riskError = (msg) => {
   e.risk = true;
   return e;
 };
+
+/** 输出文件现状：跳过时用它显示「停了多久」 */
+function describeOutput(file) {
+  try {
+    const st = fs.statSync(file);
+    return { exists: true, mtime: st.mtime.toISOString() };
+  } catch {
+    return { exists: false, mtime: null };
+  }
+}
 
 /* ---------------- HTTP ---------------- */
 function httpGet(url, cookie = '', { retries = 2, base = 5000 } = {}) {
@@ -184,15 +195,6 @@ async function fetchVideos(mid, want, attempts) {
 }
 
 /* ---------------- RSS ---------------- */
-const esc = (s) =>
-  String(s ?? '')
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&apos;');
-const cdata = (s) => '<![CDATA[' + String(s ?? '').replace(/]]>/g, ']]]]><![CDATA[>') + ']]>';
-const stripTags = (s) => String(s ?? '').replace(/<[^>]+>/g, '').trim();
 const httpsPic = (u) => (u ? String(u).replace(/^http:\/\//i, 'https://') : '');
 
 function buildFeed(videos, { mid, selfUrl, guidVersion, title = '订阅源 D' }) {
@@ -201,8 +203,7 @@ function buildFeed(videos, { mid, selfUrl, guidVersion, title = '订阅源 D' })
 
   const itemXml = videos
     .map((v) => {
-      const guidValue = guidVersion ? `${v.url}#${guidVersion}` : v.url;
-      const guidAttr = guidVersion ? ' isPermaLink="false"' : ' isPermaLink="true"';
+      const guid = guidFields(v.url, guidVersion);
       const bits = [];
       if (v.duration) bits.push(`时长 ${v.duration}`);
       if (v.play) bits.push(`播放 ${v.play}`);
@@ -217,24 +218,25 @@ function buildFeed(videos, { mid, selfUrl, guidVersion, title = '订阅源 D' })
       return `    <item>
       <title>${esc(v.title)}</title>
       <link>${esc(v.url)}</link>
-      <guid${guidAttr}>${esc(guidValue)}</guid>
+      <guid${guid.attr}>${esc(guid.value)}</guid>
       <description>${cdata(desc)}</description>
       <category>${esc(title)}</category>${v.date ? `\n      <pubDate>${v.date.toUTCString()}</pubDate>` : ''}
     </item>`;
     })
     .join('\n');
 
+  const channel = rssChannel({
+    title,
+    link: `https://space.bilibili.com/${mid}`,
+    description: title,
+    selfUrl,
+    buildDate: now,
+    pubDate: newest,
+  });
+
   return `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
-  <channel>
-    <title>${esc(title)}</title>
-    <link>${esc(`https://space.bilibili.com/${mid}`)}</link>
-    <description>${esc(title)}</description>
-    <language>zh-CN</language>
-    <lastBuildDate>${now.toUTCString()}</lastBuildDate>
-    <pubDate>${newest.toUTCString()}</pubDate>
-    <generator>rss 1.0.0</generator>
-    <ttl>60</ttl>${selfUrl ? `\n    <atom:link href="${esc(selfUrl)}" rel="self" type="application/rss+xml" />` : ''}
+${channel}
 ${itemXml}
   </channel>
 </rss>
@@ -294,14 +296,18 @@ const HELP = `gen-d.mjs
   --self <URL>       写入 atom:link self
   --guid-version <v> 给条目 GUID 加版本号
   --attempts <n>     整体重试次数（默认 3，仅用于网络类失败）
-//                    命中风控时直接跳过本轮（保留上次内容），不重试
+                     命中风控时直接跳过本轮（保留上次内容），不重试
   --force            内容没变也重写文件
+  --no-history       不与已有输出合并历史条目
+  --max-items <n>    历史合并后的条目上限（默认 300）
   -h, --help
 `;
 
 /* ---------------- 主流程 ---------------- */
+let opts = null;
+
 (async () => {
-  const opts = parseArgs(process.argv.slice(2));
+  opts = parseArgs(process.argv.slice(2));
   if (opts.help) {
     console.log(HELP);
     return;
@@ -328,26 +334,35 @@ const HELP = `gen-d.mjs
   if (!videos.length) throw new Error('没有解析到任何视频，接口结构可能已变化');
   videos.sort((a, b) => (b.date?.getTime() || 0) - (a.date?.getTime() || 0));
 
-  let xml = buildFeed(videos, { mid: opts.mid, selfUrl: opts.self, guidVersion: opts.guidVersion, title: opts.title });
-  if (opts.history) xml = mergeHistoryIntoXml(xml, opts.out, { maxItems: opts.maxItems });
-
-  const signature = (s) =>
-    s.replace(/<lastBuildDate>[^<]*<\/lastBuildDate>/, '').replace(/<pubDate>[^<]*<\/pubDate>/, '');
-  if (!opts.force && fs.existsSync(opts.out)) {
-    const prev = fs.readFileSync(opts.out, 'utf8');
-    if (signature(prev) === signature(xml)) {
-      console.log(`内容无变化，保留原文件 ${opts.out}`);
-      return;
-    }
+  const xml = buildFeed(videos, { mid: opts.mid, selfUrl: opts.self, guidVersion: opts.guidVersion, title: opts.title });
+  const { changed, xml: outXml } = writeFeedOutput(opts.out, xml, {
+    history: opts.history,
+    maxItems: opts.maxItems,
+    force: opts.force,
+  });
+  if (!changed) {
+    console.log(`内容无变化，保留原文件 ${opts.out}`);
+    return;
   }
 
-  fs.writeFileSync(opts.out, xml, 'utf8');
   console.log(`最新：${videos[0].dateRaw} ${videos[0].title.slice(0, 36)}`);
-  console.log(`已写入 ${opts.out}（共 ${(xml.match(/<item>/g) || []).length} 条，${(xml.length / 1024).toFixed(1)} KB）`);
+  console.log(
+    `已写入 ${opts.out}（共 ${(outXml.match(/<item>/g) || []).length} 条，${(outXml.length / 1024).toFixed(1)} KB）`
+  );
 })().catch((e) => {
   if (e.risk) {
     // 风控命中：当作“本轮跳过”，以成功状态退出，保留上一次的订阅内容，等下一轮再试
+    const label = opts?.title || opts?.mid || '未知源';
+    const out = opts?.out || 'feed-d.xml';
+    const st = describeOutput(out);
     console.log(`[跳过] ${e.message} —— 本轮不更新，保留上次内容，等下一轮再试`);
+    console.log(
+      st.exists
+        ? `  上次输出 ${out} 仍保留（最后一次写入 ${st.mtime}）`
+        : `  输出文件 ${out} 不存在：本次没有任何内容可保留`
+    );
+    // 用 Actions 注解让「静默跳过」在 CI 上可见（本地运行只是一行普通输出）
+    console.log(`::warning title=B站风控::源 ${label} 本轮被风控跳过，feed 未更新`);
     process.exit(0);
   }
   console.error('运行失败：' + e.message);

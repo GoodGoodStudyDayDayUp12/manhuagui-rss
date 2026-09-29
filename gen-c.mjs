@@ -3,11 +3,11 @@
 
 
 import https from 'node:https';
-import fs from 'node:fs';
 import {
   esc,
   cdata,
   sleep,
+  cleanText,
   sliceDiv,
   sanitizeContent,
   SANITIZER_VERSION,
@@ -16,13 +16,18 @@ import {
   loadContentCache,
   saveContentCache,
   pruneCache,
-  unchangedFile,
-  mergeHistoryIntoXml,
+  guidFields,
+  rssChannel,
+  writeFeedOutput,
 } from './lib.mjs';
 
 const DATA_URL = 'https://www.gov.cn/zhengce/zuixin/ZUIXINZHENGCE.json';
 const PAGE_URL = 'https://www.gov.cn/zhengce/zuixin/';
 const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36';
+
+// 本站正文缓存版本：与 SANITIZER_VERSION 解耦，抽取/元数据逻辑变化时 +1。
+// 取独立大数是为了让历史上 meta 为空的旧缓存失效、重新抓正文与分类。
+const CACHE_VERSION = SANITIZER_VERSION * 10 + 100;
 
 const parseDate = (d) => {
   if (!d) return null;
@@ -117,33 +122,30 @@ function buildFeed(items, { selfUrl, filterDesc, guidVersion = '' }) {
         (it.meta['发文机关'] ? `\n      <category>${esc(it.meta['发文机关'])}</category>` : '') +
         (it.meta['主题分类'] ? `\n      <category>${esc(it.meta['主题分类'])}</category>` : '');
 
-      const guidValue = guidVersion ? `${it.url}#${guidVersion}` : it.url;
-      const guidAttr = guidVersion ? ' isPermaLink="false"' : ' isPermaLink="true"';
+      const guid = guidFields(it.url, guidVersion);
 
       return `    <item>
       <title>${esc(it.title)}</title>
       <link>${esc(it.url)}</link>
-      <guid${guidAttr}>${esc(guidValue)}</guid>
+      <guid${guid.attr}>${esc(guid.value)}</guid>
       <description>${cdata(desc)}</description>
 ${extraCategories}${it.date ? `\n      <pubDate>${it.date.toUTCString()}</pubDate>` : ''}
     </item>`;
     })
     .join('\n');
 
+  const channel = rssChannel({
+    title: '订阅源 C',
+    link: PAGE_URL,
+    description: `订阅源 C${filterDesc ? '；' + filterDesc : ''}`,
+    selfUrl,
+    buildDate: now,
+    pubDate: newest,
+  });
+
   return `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
-  <channel>
-    <title>订阅源 C</title>
-    <link>${esc(PAGE_URL)}</link>
-    <description>${esc(
-      `订阅源 C${filterDesc ? '；' + filterDesc : ''}`
-    )}</description>
-    <language>zh-CN</language>
-    <lastBuildDate>${now.toUTCString()}</lastBuildDate>
-    <pubDate>${newest.toUTCString()}</pubDate>
-    <generator>rss 1.0.0</generator>
-    <ttl>60</ttl>
-    ${selfUrl ? `\n    <atom:link href="${esc(selfUrl)}" rel="self" type="application/rss+xml" />` : ''}
+${channel}
 ${itemXml}
   </channel>
 </rss>
@@ -251,6 +253,7 @@ const HELP = `gen-c.mjs
   let filterDesc = '';
   if (opts.since) {
     const since = parseDate(opts.since);
+    if (!since) throw new Error(`--since 无法解析为日期：${opts.since}（应为 2024-01-31 这样的形式）`);
     const before = items.length;
     items = items.filter((it) => it.date && it.date >= since);
     filterDesc = `仅 ${opts.since} 之后（${items.length}/${before} 条）`;
@@ -284,7 +287,7 @@ const HELP = `gen-c.mjs
       const it = items[i];
       const hit = cache[it.url];
       // 旧版缓存（纯文本 / 旧清洗规则）视为未命中，自动重抓带排版的版本
-      if (hit && !opts.refreshContent && typeof hit.contentHtml === 'string' && hit.v === SANITIZER_VERSION) {
+      if (hit && !opts.refreshContent && typeof hit.contentHtml === 'string' && hit.v === CACHE_VERSION) {
         it.meta = hit.meta || {};
         it.contentHtml = hit.contentHtml;
         fromCache++;
@@ -297,7 +300,7 @@ const HELP = `gen-c.mjs
         it.contentHtml = art.contentHtml;
         cache[it.url] = {
           fetchedAt: new Date().toISOString(),
-          v: SANITIZER_VERSION,
+          v: CACHE_VERSION,
           meta: art.meta,
           contentHtml: art.contentHtml,
         };
@@ -320,14 +323,7 @@ const HELP = `gen-c.mjs
     }
 
     // 只保留当前条目用到的缓存，避免文件无限增长
-    const keep = new Set(items.map((x) => x.url));
-    let dropped = 0;
-    for (const k of Object.keys(cache)) {
-      if (!keep.has(k)) {
-        delete cache[k];
-        dropped++;
-      }
-    }
+    const dropped = pruneCache(cache, items.map((x) => x.url));
 
     saveContentCache(opts.contentCache, cache);
     console.log(
@@ -336,26 +332,22 @@ const HELP = `gen-c.mjs
     );
   }
 
-  let xml = buildFeed(items, { selfUrl: opts.self, filterDesc, guidVersion: opts.guidVersion });
-  if (opts.history) xml = mergeHistoryIntoXml(xml, opts.out, { maxItems: opts.maxItems });
+  const xml = buildFeed(items, { selfUrl: opts.self, filterDesc, guidVersion: opts.guidVersion });
   const newest = items[0];
   console.log(`\n输出 ${items.length} 条，最新：${newest.dateRaw} ${newest.title.slice(0, 40)}`);
   console.log(`最旧：${items[items.length - 1].dateRaw}`);
 
-  // 除构建时间外，频道与条目任何变化都算“有变化”；
-  // 只有 lastBuildDate / 频道 pubDate 变动时视为没变，避免产生空提交
-  const signature = (s) =>
-    s.replace(/<lastBuildDate>[^<]*<\/lastBuildDate>/, '').replace(/<pubDate>[^<]*<\/pubDate>/, '');
-  if (!opts.force && fs.existsSync(opts.out)) {
-    const prev = fs.readFileSync(opts.out, 'utf8');
-    if (signature(prev) === signature(xml)) {
-      console.log(`内容无变化，保留原文件 ${opts.out}（不产生新提交）`);
-      return;
-    }
+  // 除构建时间外，频道与条目任何变化都算“有变化”，避免产生空提交
+  const { changed, xml: outXml } = writeFeedOutput(opts.out, xml, {
+    history: opts.history,
+    maxItems: opts.maxItems,
+    force: opts.force,
+  });
+  if (!changed) {
+    console.log(`内容无变化，保留原文件 ${opts.out}（不产生新提交）`);
+    return;
   }
-
-  fs.writeFileSync(opts.out, xml, 'utf8');
-  console.log(`已写入 ${opts.out}（${(xml.length / 1024).toFixed(1)} KB）`);
+  console.log(`已写入 ${opts.out}（${(outXml.length / 1024).toFixed(1)} KB）`);
 })().catch((e) => {
   console.error('运行失败：' + e.message);
   process.exit(1);

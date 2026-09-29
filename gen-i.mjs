@@ -6,10 +6,10 @@
 // 选项:
 //   --config <文件>    配置文件（一次生成多个关键词源）
 //   --keyword <词>     搜索关键词（默认 肯德基）
-//   --url <地址>       直接指定完整搜索地址（会覆盖 keyword）
+//   --url <地址>       直接指定完整搜索地址（会覆盖 keyword，只抓这一页）
 //   --out <文件>       输出文件（默认 feed-i.xml）
 //   --limit <n>        输出条数（默认 100）
-//   --pages <n>        抓前 n 页（每页 30 条左右，默认 1）
+//   --pages <n>        抓前 n 页（每页 30 条左右，默认 1；仅关键词搜索生效）
 //   --max-items <n>    合并历史后总条数上限（默认 300）
 //   --no-history       不保留历史条目
 //   --self <URL>       写入 atom:link self
@@ -17,64 +17,24 @@
 //   --force            内容没变也重写文件
 //   -h, --help
 
-import https from 'node:https';
 import fs from 'node:fs';
 import path from 'node:path';
-import { esc, cdata, sleep, cleanText, decodeEntities, unchangedFile, mergeHistoryIntoXml } from './lib.mjs';
+import {
+  esc,
+  cdata,
+  sleep,
+  cleanText,
+  decodeEntities,
+  httpText,
+  guidFields,
+  rssChannel,
+  writeFeedOutput,
+} from './lib.mjs';
 
 const KEYWORD_DEFAULT = '肯德基';
 const BASE = 'https://s.manmanbuy.com';
-const UA =
-  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36';
 
-/* ---------------- 抓取 ---------------- */
-function fetchText(url, retries = 3, depth = 0) {
-  const once = () =>
-    new Promise((resolve, reject) => {
-      const req = https.get(
-        url,
-        {
-          headers: {
-            'User-Agent': UA,
-            Accept: 'text/html,application/xhtml+xml,*/*',
-            'Accept-Language': 'zh-CN,zh;q=0.9',
-            'Accept-Encoding': 'identity',
-          },
-        },
-        (res) => {
-          if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location && depth < 5) {
-            res.resume();
-            return resolve(fetchText(new URL(res.headers.location, url).href, retries, depth + 1));
-          }
-          if (res.statusCode !== 200) {
-            res.resume();
-            const err = new Error(`HTTP ${res.statusCode}`);
-            err.statusCode = res.statusCode;
-            return reject(err);
-          }
-          const chunks = [];
-          res.on('data', (c) => chunks.push(c));
-          res.on('end', () => resolve(Buffer.concat(chunks).toString('utf8')));
-        }
-      );
-      req.setTimeout(25000, () => req.destroy(new Error('请求超时')));
-      req.on('error', reject);
-    });
-
-  return (async () => {
-    let last;
-    for (let i = 0; i <= retries; i++) {
-      try {
-        return await once();
-      } catch (e) {
-        last = e;
-        if (e.statusCode === 403 || e.statusCode === 404) break;
-        if (i < retries) await sleep(1000 * (i + 1));
-      }
-    }
-    throw last;
-  })();
-}
+/* ---------------- 抓取（实现见 lib.mjs httpText） ---------------- */
 
 /* ---------------- 列表解析 ---------------- */
 // 站点用 Next.js CSS Modules，类名后缀哈希会变，这里统一按前缀匹配
@@ -137,8 +97,7 @@ function parseDealTime(s) {
 
 /* ---------------- RSS ---------------- */
 function renderItem(it, guidVersion) {
-  const guidValue = guidVersion ? `${it.url}#v${guidVersion}` : it.url;
-  const guidAttr = guidVersion ? ' isPermaLink="false"' : ' isPermaLink="true"';
+  const guid = guidFields(it.url, guidVersion);
   const meta = [it.mall, it.timeRaw, it.tag, it.badge].filter(Boolean).join('　');
   const stat = [it.comments ? `评论 ${it.comments}` : '', it.hot ? `热度 ${it.hot}` : ''].filter(Boolean).join('　');
   const desc =
@@ -151,7 +110,7 @@ function renderItem(it, guidVersion) {
   return `    <item>
       <title>${esc(it.title)}</title>
       <link>${esc(it.url)}</link>
-      <guid${guidAttr}>${esc(guidValue)}</guid>
+      <guid${guid.attr}>${esc(guid.value)}</guid>
       <description>${cdata(desc)}</description>${it.mall ? `\n      <category>${esc(it.mall)}</category>` : ''}${it.date ? `\n      <pubDate>${it.date.toUTCString()}</pubDate>` : ''}
     </item>`;
 }
@@ -161,17 +120,18 @@ function buildFeed(deals, { selfUrl, guidVersion, limit, pageUrl, title }) {
   const newest = deals[0]?.date || now;
   const rendered = deals.map((it) => renderItem(it, guidVersion));
 
+  const channel = rssChannel({
+    title: title || '订阅源 I',
+    link: pageUrl,
+    description: title || '订阅源 I',
+    selfUrl,
+    buildDate: now,
+    pubDate: newest,
+  });
+
   return `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
-  <channel>
-    <title>${esc(title || '订阅源 I')}</title>
-    <link>${esc(pageUrl)}</link>
-    <description>${esc(title || '订阅源 I')}</description>
-    <language>zh-CN</language>
-    <lastBuildDate>${now.toUTCString()}</lastBuildDate>
-    <pubDate>${newest.toUTCString()}</pubDate>
-    <generator>rss 1.0.0</generator>
-    <ttl>60</ttl>${selfUrl ? `\n    <atom:link href="${esc(selfUrl)}" rel="self" type="application/rss+xml" />` : ''}
+${channel}
 ${rendered.slice(0, limit > 0 ? limit : undefined).join('\n')}
   </channel>
 </rss>
@@ -228,12 +188,13 @@ const HELP = `gen-i.mjs
 用法: node gen-i.mjs [选项]
 
 选项:
-//   --keyword <词>     搜索关键词（默认 肯德基）
-  --url <地址>       直接指定完整搜索地址
+  --config <文件>    配置文件（一次生成多个关键词源）
+  --keyword <词>     搜索关键词（默认 肯德基）
+  --url <地址>       直接指定完整搜索地址（一次只抓这一页，忽略 --pages）
   --out <文件>       输出文件（默认 feed-i.xml）
   --title <名称>     频道标题（默认 订阅源 I）
   --limit <n>        输出条数（默认 100）
-  --pages <n>        抓前 n 页（默认 1）
+  --pages <n>        抓前 n 页（每页 30 条左右，默认 1；仅关键词搜索生效）
   --max-items <n>    合并历史后总条数上限（默认 300）
   --no-history       不保留历史条目
   --self <URL>       写入 atom:link self
@@ -251,16 +212,21 @@ const pageUrlFor = (opts, page) =>
 /** 生成单个源 */
 async function runOne(opts) {
   const label = opts.url ? opts.url : `关键词 ${opts.keyword}`;
+  // --url 是完整地址，页码参数对它无效：只用第一页，避免对同一地址重复抓取
+  if (opts.url && opts.pages > 1) {
+    console.warn(`--url 已指定完整地址，--pages ${opts.pages} 不适用：只抓第一页`);
+  }
+  const pages = opts.url ? 1 : Math.max(1, opts.pages);
   const all = [];
   const seen = new Set();
-  for (let p = 1; p <= Math.max(1, opts.pages); p++) {
+  for (let p = 1; p <= pages; p++) {
     const u = pageUrlFor(opts, p);
     console.log(`抓取第 ${p} 页：${u}`);
-    const html = await fetchText(u);
+    const html = await httpText(u);
     const deals = parseDeals(html);
     console.log(`  解析到 ${deals.length} 条`);
     for (const d of deals) if (!seen.has(d.url)) { seen.add(d.url); all.push(d); }
-    if (p < opts.pages) await sleep(800);
+    if (p < pages) await sleep(800);
   }
 
   if (!all.length) throw new Error('没有解析到条目，页面结构可能已变化');
@@ -275,24 +241,26 @@ async function runOne(opts) {
     all.push(...sorted, ...rest);
   }
 
-  let xml = buildFeed(all, {
+  const xml = buildFeed(all, {
     selfUrl: opts.self,
     guidVersion: opts.guidVersion,
     limit: opts.limit,
     pageUrl: pageUrlFor(opts, 1),
     title: opts.title,
   });
-  if (opts.history) xml = mergeHistoryIntoXml(xml, opts.out, { maxItems: opts.maxItems });
-
-  if (!opts.force && fs.existsSync(opts.out) && unchangedFile(opts.out, xml)) {
+  const { changed, xml: outXml } = writeFeedOutput(opts.out, xml, {
+    history: opts.history,
+    maxItems: opts.maxItems,
+    force: opts.force,
+  });
+  if (!changed) {
     console.log(`内容无变化，保留原文件 ${opts.out}`);
     return;
   }
 
-  fs.writeFileSync(opts.out, xml, 'utf8');
-  const total = (xml.match(/<item>/g) || []).length;
+  const total = (outXml.match(/<item>/g) || []).length;
   console.log(`  最新：${all[0].timeRaw} ${all[0].title.slice(0, 40)}`);
-  console.log(`  已写入 ${path.basename(opts.out)}（共 ${total} 条，${(xml.length / 1024).toFixed(1)} KB）`);
+  console.log(`  已写入 ${path.basename(opts.out)}（共 ${total} 条，${(outXml.length / 1024).toFixed(1)} KB）`);
   return total;
 }
 
@@ -337,11 +305,13 @@ async function runOne(opts) {
     } catch (e) {
       failed++;
       console.error(`  [失败] ${label}：${e.message}`);
+      console.log(`::warning title=源抓取失败::${label} ${String(e.message).slice(0, 120)}`);
     }
   }
   console.log(`\n完成：成功 ${ok} 个，失败 ${failed} 个`);
   if (!ok) process.exit(1);
 })().catch((e) => {
   console.error('运行失败：' + e.message);
+  console.log(`::warning title=源抓取失败::${String(e.message).slice(0, 120)}`);
   process.exit(1);
 });

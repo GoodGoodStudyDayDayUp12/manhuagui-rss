@@ -22,8 +22,6 @@
 //   --force            内容没变也重写文件
 //   -h, --help
 
-import https from 'node:https';
-import fs from 'node:fs';
 import {
   esc,
   cdata,
@@ -31,72 +29,27 @@ import {
   cleanText,
   decodeEntities,
   sanitizeContent,
-  unchangedFile,
-  mergeHistoryIntoXml,
   loadContentCache,
   saveContentCache,
   pruneCache,
   textLength,
   truncateHtml,
   SANITIZER_VERSION,
+  httpText,
+  guidFields,
+  rssChannel,
+  writeFeedOutput,
 } from './lib.mjs';
 
 const PAGE_URL = 'https://www.zaobao.com.sg/news/china';
 const ORIGIN = 'https://www.zaobao.com.sg';
-const UA =
-  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36';
+// 该站需要英文权重更高的 Accept-Language（与其余源不同，必须显式传入）
+const ACCEPT_LANGUAGE = 'zh-CN,zh;q=0.9,en;q=0.8';
 
 // 正文抽取规则变化时 +1，旧缓存自动失效
 const CACHE_VERSION = SANITIZER_VERSION * 10 + 1;
 
-/* ---------------- 抓取 ---------------- */
-function fetchText(url, retries = 3, depth = 0) {
-  const once = () =>
-    new Promise((resolve, reject) => {
-      const req = https.get(
-        url,
-        {
-          headers: {
-            'User-Agent': UA,
-            Accept: 'text/html,application/xhtml+xml,*/*',
-            'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
-            'Accept-Encoding': 'identity',
-          },
-        },
-        (res) => {
-          if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location && depth < 5) {
-            res.resume();
-            return resolve(fetchText(new URL(res.headers.location, url).href, retries, depth + 1));
-          }
-          if (res.statusCode !== 200) {
-            res.resume();
-            const err = new Error(`HTTP ${res.statusCode}`);
-            err.statusCode = res.statusCode;
-            return reject(err);
-          }
-          const chunks = [];
-          res.on('data', (c) => chunks.push(c));
-          res.on('end', () => resolve(Buffer.concat(chunks).toString('utf8')));
-        }
-      );
-      req.setTimeout(25000, () => req.destroy(new Error('请求超时')));
-      req.on('error', reject);
-    });
-
-  return (async () => {
-    let last;
-    for (let i = 0; i <= retries; i++) {
-      try {
-        return await once();
-      } catch (e) {
-        last = e;
-        if (e.statusCode === 403 || e.statusCode === 404) break;
-        if (i < retries) await sleep(1000 * (i + 1));
-      }
-    }
-    throw last;
-  })();
-}
+/* ---------------- 抓取（实现见 lib.mjs httpText） ---------------- */
 
 /* ---------------- 列表解析 ---------------- */
 function parseList(html) {
@@ -178,8 +131,7 @@ const parseDate = (d) => {
 };
 
 function renderItem(it, guidVersion) {
-  const guidValue = guidVersion ? `${it.url}#v${guidVersion}` : it.url;
-  const guidAttr = guidVersion ? ' isPermaLink="false"' : ' isPermaLink="true"';
+  const guid = guidFields(it.url, guidVersion, { vPrefix: true });
   const infoParts = [it.dateRaw, it.meta?.datetime, it.meta?.author ? `作者：${it.meta.author}` : ''].filter(Boolean);
   const desc =
     `<p><strong>${esc(it.title)}</strong></p>` +
@@ -189,7 +141,7 @@ function renderItem(it, guidVersion) {
   return `    <item>
       <title>${esc(it.title)}</title>
       <link>${esc(it.url)}</link>
-      <guid${guidAttr}>${esc(guidValue)}</guid>
+      <guid${guid.attr}>${esc(guid.value)}</guid>
       <description>${cdata(desc)}</description>${it.date ? `\n      <pubDate>${it.date.toUTCString()}</pubDate>` : ''}
     </item>`;
 }
@@ -199,17 +151,18 @@ function buildFeed(items, { selfUrl, guidVersion, limit }) {
   const newest = items[0]?.date || now;
   const rendered = items.map((it) => renderItem(it, guidVersion));
 
+  const channel = rssChannel({
+    title: '订阅源 G',
+    link: PAGE_URL,
+    description: '订阅源 G',
+    selfUrl,
+    buildDate: now,
+    pubDate: newest,
+  });
+
   return `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
-  <channel>
-    <title>订阅源 G</title>
-    <link>${esc(PAGE_URL)}</link>
-    <description>订阅源 G</description>
-    <language>zh-CN</language>
-    <lastBuildDate>${now.toUTCString()}</lastBuildDate>
-    <pubDate>${newest.toUTCString()}</pubDate>
-    <generator>rss 1.0.0</generator>
-    <ttl>60</ttl>${selfUrl ? `\n    <atom:link href="${esc(selfUrl)}" rel="self" type="application/rss+xml" />` : ''}
+${channel}
 ${rendered.slice(0, limit > 0 ? limit : undefined).join('\n')}
   </channel>
 </rss>
@@ -293,7 +246,7 @@ const HELP = `gen-g.mjs
   }
 
   console.log(`抓取列表页：${opts.url}`);
-  const html = await fetchText(opts.url);
+  const html = await httpText(opts.url, { headers: { 'Accept-Language': ACCEPT_LANGUAGE } });
   let items = parseList(html);
   console.log(`解析到 ${items.length} 条`);
   if (!items.length) throw new Error('没有解析到条目，页面结构可能已变化');
@@ -325,7 +278,7 @@ const HELP = `gen-g.mjs
         continue;
       }
       try {
-        const page = await fetchText(it.url);
+        const page = await httpText(it.url, { headers: { 'Accept-Language': ACCEPT_LANGUAGE } });
         const art = extractArticle(page);
         it.meta = art.meta;
         it.contentHtml = truncateHtml(art.contentHtml, opts.contentMax);
@@ -358,18 +311,20 @@ const HELP = `gen-g.mjs
     );
   }
 
-  let xml = buildFeed(items, { selfUrl: opts.self, guidVersion: opts.guidVersion, limit: opts.limit });
-  if (opts.history) xml = mergeHistoryIntoXml(xml, opts.out, { maxItems: opts.maxItems });
-
-  if (!opts.force && fs.existsSync(opts.out) && unchangedFile(opts.out, xml)) {
+  const xml = buildFeed(items, { selfUrl: opts.self, guidVersion: opts.guidVersion, limit: opts.limit });
+  const { changed, xml: outXml } = writeFeedOutput(opts.out, xml, {
+    history: opts.history,
+    maxItems: opts.maxItems,
+    force: opts.force,
+  });
+  if (!changed) {
     console.log(`内容无变化，保留原文件 ${opts.out}`);
     return;
   }
 
-  fs.writeFileSync(opts.out, xml, 'utf8');
-  const total = (xml.match(/<item>/g) || []).length;
+  const total = (outXml.match(/<item>/g) || []).length;
   console.log(`最新：${items[0].dateRaw} ${items[0].title.slice(0, 40)}`);
-  console.log(`已写入 ${opts.out}（共 ${total} 条，${(xml.length / 1024).toFixed(1)} KB）`);
+  console.log(`已写入 ${opts.out}（共 ${total} 条，${(outXml.length / 1024).toFixed(1)} KB）`);
 })().catch((e) => {
   console.error('运行失败：' + e.message);
   process.exit(1);

@@ -10,75 +10,27 @@
 //   --self <URL>       写入 atom:link self
 //   --guid-version <v> 给条目 GUID 加版本号
 //   --force            内容没变也重写文件
+//   --no-history       不与已有输出合并历史条目
+//   --max-items <n>    历史合并后的条目上限（默认 300）
 //   -h, --help
 
-import https from 'node:https';
-import fs from 'node:fs';
 import {
   esc,
   cdata,
-  sleep,
   cleanText,
   sliceDiv,
   sanitizeContent,
   absolutizeUrls,
-  unchangedFile,
-  mergeHistoryIntoXml,
+  httpText,
+  guidFields,
+  rssChannel,
+  writeFeedOutput,
 } from './lib.mjs';
 
 const PAGE_URL = 'https://api-docs.deepseek.com/zh-cn/updates/';
 const ORIGIN = 'https://api-docs.deepseek.com';
-const UA =
-  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36';
 
-/* ---------------- 抓取 ---------------- */
-function fetchText(url, retries = 3, depth = 0) {
-  const once = () =>
-    new Promise((resolve, reject) => {
-      const req = https.get(
-        url,
-        {
-          headers: {
-            'User-Agent': UA,
-            Accept: 'text/html,application/xhtml+xml,*/*',
-            'Accept-Language': 'zh-CN,zh;q=0.9',
-            'Accept-Encoding': 'identity',
-          },
-        },
-        (res) => {
-          if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location && depth < 5) {
-            res.resume();
-            return resolve(fetchText(new URL(res.headers.location, url).href, retries, depth + 1));
-          }
-          if (res.statusCode !== 200) {
-            res.resume();
-            const err = new Error(`HTTP ${res.statusCode}`);
-            err.statusCode = res.statusCode;
-            return reject(err);
-          }
-          const chunks = [];
-          res.on('data', (c) => chunks.push(c));
-          res.on('end', () => resolve(Buffer.concat(chunks).toString('utf8')));
-        }
-      );
-      req.setTimeout(25000, () => req.destroy(new Error('请求超时')));
-      req.on('error', reject);
-    });
-
-  return (async () => {
-    let last;
-    for (let i = 0; i <= retries; i++) {
-      try {
-        return await once();
-      } catch (e) {
-        last = e;
-        if (e.statusCode === 403 || e.statusCode === 404) break;
-        if (i < retries) await sleep(1000 * (i + 1));
-      }
-    }
-    throw last;
-  })();
-}
+/* ---------------- 抓取（实现见 lib.mjs httpText） ---------------- */
 
 /* ---------------- 解析更新条目 ---------------- */
 function parseEntries(html) {
@@ -136,8 +88,7 @@ function buildFeed(entries, { selfUrl, guidVersion }) {
   const itemXml = entries
     .map((e) => {
       const link = e.anchor ? `${PAGE_URL}#${encodeURIComponent(e.anchor)}` : PAGE_URL;
-      const guidValue = guidVersion ? `${link}#v${guidVersion}` : link;
-      const guidAttr = guidVersion ? ' isPermaLink="false"' : ' isPermaLink="true"';
+      const guid = guidFields(link, guidVersion, { vPrefix: true });
       const desc =
         `<p><strong>${esc(e.title)}</strong></p>` +
         `<p>${esc(e.dateRaw)}</p>` +
@@ -146,23 +97,24 @@ function buildFeed(entries, { selfUrl, guidVersion }) {
       return `    <item>
       <title>${esc(e.title)}</title>
       <link>${esc(link)}</link>
-      <guid${guidAttr}>${esc(guidValue)}</guid>
+      <guid${guid.attr}>${esc(guid.value)}</guid>
       <description>${cdata(desc)}</description>${e.date ? `\n      <pubDate>${e.date.toUTCString()}</pubDate>` : ''}
     </item>`;
     })
     .join('\n');
 
+  const channel = rssChannel({
+    title: '订阅源 F',
+    link: PAGE_URL,
+    description: '订阅源 F',
+    selfUrl,
+    buildDate: now,
+    pubDate: newest,
+  });
+
   return `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
-  <channel>
-    <title>订阅源 F</title>
-    <link>${esc(PAGE_URL)}</link>
-    <description>订阅源 F</description>
-    <language>zh-CN</language>
-    <lastBuildDate>${now.toUTCString()}</lastBuildDate>
-    <pubDate>${newest.toUTCString()}</pubDate>
-    <generator>rss 1.0.0</generator>
-    <ttl>60</ttl>${selfUrl ? `\n    <atom:link href="${esc(selfUrl)}" rel="self" type="application/rss+xml" />` : ''}
+${channel}
 ${itemXml}
   </channel>
 </rss>
@@ -217,6 +169,8 @@ const HELP = `gen-f.mjs
   --self <URL>       写入 atom:link self
   --guid-version <v> 给条目 GUID 加版本号
   --force            内容没变也重写文件
+  --no-history       不与已有输出合并历史条目
+  --max-items <n>    历史合并后的条目上限（默认 300）
   -h, --help
 `;
 
@@ -229,7 +183,7 @@ const HELP = `gen-f.mjs
   }
 
   console.log(`抓取页面：${opts.url}`);
-  const html = await fetchText(opts.url);
+  const html = await httpText(opts.url);
   let entries = parseEntries(html);
   console.log(`解析到 ${entries.length} 条更新记录`);
   if (!entries.length) throw new Error('没有解析到条目，页面结构可能已变化');
@@ -238,17 +192,21 @@ const HELP = `gen-f.mjs
   entries.sort((a, b) => (b.date?.getTime() || 0) - (a.date?.getTime() || 0));
   if (opts.limit > 0) entries = entries.slice(0, opts.limit);
 
-  let xml = buildFeed(entries, { selfUrl: opts.self, guidVersion: opts.guidVersion });
-  if (opts.history) xml = mergeHistoryIntoXml(xml, opts.out, { maxItems: opts.maxItems });
-
-  if (!opts.force && fs.existsSync(opts.out) && unchangedFile(opts.out, xml)) {
+  const xml = buildFeed(entries, { selfUrl: opts.self, guidVersion: opts.guidVersion });
+  const { changed, xml: outXml } = writeFeedOutput(opts.out, xml, {
+    history: opts.history,
+    maxItems: opts.maxItems,
+    force: opts.force,
+  });
+  if (!changed) {
     console.log(`内容无变化，保留原文件 ${opts.out}`);
     return;
   }
 
-  fs.writeFileSync(opts.out, xml, 'utf8');
   console.log(`最新：${entries[0].dateRaw} ${entries[0].title.slice(0, 40)}`);
-  console.log(`已写入 ${opts.out}（共 ${(xml.match(/<item>/g) || []).length} 条，${(xml.length / 1024).toFixed(1)} KB）`);
+  console.log(
+    `已写入 ${opts.out}（共 ${(outXml.match(/<item>/g) || []).length} 条，${(outXml.length / 1024).toFixed(1)} KB）`
+  );
 })().catch((e) => {
   console.error('运行失败：' + e.message);
   process.exit(1);

@@ -10,6 +10,8 @@
 //   --self <URL>       写入 atom:link self
 //   --guid-version <v> 给条目 GUID 加版本号
 //   --force            内容没变也重写文件
+//   --no-history       不与已有输出合并历史条目
+//   --max-items <n>    历史合并后的条目上限（默认 300）
 //
 // 正文相关:
 //   --with-content     抓每篇正文（含翻页、主图与图注、来源与时间）
@@ -20,9 +22,6 @@
 //   --refresh-content  忽略缓存重抓
 //   -h, --help
 
-import http from 'node:http';
-import https from 'node:https';
-import fs from 'node:fs';
 import {
   esc,
   cdata,
@@ -36,81 +35,19 @@ import {
   loadContentCache,
   saveContentCache,
   pruneCache,
-  unchangedFile,
-  mergeHistoryIntoXml,
   absolutizeUrls,
+  httpText,
+  guidFields,
+  rssChannel,
+  writeFeedOutput,
 } from './lib.mjs';
 
 const PAGE_URL = 'http://finance.people.com.cn/GB/70846/index.html';
 const ORIGIN = 'http://finance.people.com.cn';
 // 本站缓存版本：正文抽取规则（尤其图片挑选取舍）变化时 +1，旧缓存自动失效
 const CACHE_VERSION = SANITIZER_VERSION * 10 + 3;
-const UA =
-  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36';
 
-/* ---------------- 抓取（兼容 GBK 页面） ---------------- */
-function fetchText(url, retries = 3, depth = 0) {
-  const once = () =>
-    new Promise((resolve, reject) => {
-      const lib = url.startsWith('https') ? https : http;
-      const req = lib.get(
-        url,
-        {
-          headers: {
-            'User-Agent': UA,
-            Accept: 'text/html,application/xhtml+xml,*/*',
-            'Accept-Language': 'zh-CN,zh;q=0.9',
-            'Accept-Encoding': 'identity',
-          },
-        },
-        (res) => {
-          if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location && depth < 5) {
-            res.resume();
-            return resolve(fetchText(new URL(res.headers.location, url).href, retries, depth + 1));
-          }
-          if (res.statusCode !== 200) {
-            res.resume();
-            const err = new Error(`HTTP ${res.statusCode}`);
-            err.statusCode = res.statusCode;
-            return reject(err);
-          }
-          const chunks = [];
-          res.on('data', (c) => chunks.push(c));
-          res.on('end', () => {
-            const buf = Buffer.concat(chunks);
-            const head = buf.toString('latin1', 0, 2000);
-            const m = head.match(/charset=["']?([\w-]+)/i);
-            const cs = (m ? m[1] : 'utf-8').toLowerCase();
-            if (/gb2312|gbk|gb18030/.test(cs)) {
-              try {
-                resolve(new TextDecoder('gb18030').decode(buf));
-                return;
-              } catch {
-                /* 环境不支持时退回 utf8 */
-              }
-            }
-            resolve(buf.toString('utf8'));
-          });
-        }
-      );
-      req.setTimeout(25000, () => req.destroy(new Error('请求超时')));
-      req.on('error', reject);
-    });
-
-  return (async () => {
-    let last;
-    for (let i = 0; i <= retries; i++) {
-      try {
-        return await once();
-      } catch (e) {
-        last = e;
-        if (e.statusCode === 403 || e.statusCode === 404) break;
-        if (i < retries) await sleep(1000 * (i + 1));
-      }
-    }
-    throw last;
-  })();
-}
+/* ---------------- 抓取（兼容 GBK 页面，实现见 lib.mjs httpText） ---------------- */
 
 /* ---------------- 列表解析 ---------------- */
 function parseList(html) {
@@ -223,7 +160,7 @@ const bodyKey = (h) => textLength(h) + ':' + String(h).slice(0, 200);
 
 /** 抓一篇正文，必要时翻页（同内容页会自动跳过，避免重复拼接） */
 async function fetchArticle(url, maxPages) {
-  const html = await fetchText(url);
+  const html = await httpText(url, { decodeGb: true });
   const first = extractArticle(html, { withLead: true });
   const parts = [first.contentHtml];
   // 该模板的“下一页”各页正文完全相同，用纯正文指纹去重
@@ -235,7 +172,7 @@ async function fetchArticle(url, maxPages) {
     const nextUrl = /^https?:/i.test(next) ? next : ORIGIN + (next.startsWith('/') ? '' : '/') + next;
     await sleep(400);
     try {
-      const more = await fetchText(nextUrl);
+      const more = await httpText(nextUrl, { decodeGb: true });
       const a = extractArticle(more, { withLead: false });
       const key = bodyKey(a.bodyHtml);
       if (!a.bodyHtml || seen.has(key)) break; // 内容重复 → 没有真正的下一页
@@ -264,8 +201,7 @@ function buildFeed(items, { selfUrl, guidVersion }) {
 
   const itemXml = items
     .map((it) => {
-      const guidValue = guidVersion ? `${it.url}#${guidVersion}` : it.url;
-      const guidAttr = guidVersion ? ' isPermaLink="false"' : ' isPermaLink="true"';
+      const guid = guidFields(it.url, guidVersion);
       const info = [it.dateRaw, it.meta?.datetime, it.meta?.source ? `来源：${it.meta.source}` : '']
         .filter(Boolean)
         .join('　');
@@ -278,23 +214,24 @@ function buildFeed(items, { selfUrl, guidVersion }) {
       return `    <item>
       <title>${esc(it.title)}</title>
       <link>${esc(it.url)}</link>
-      <guid${guidAttr}>${esc(guidValue)}</guid>
+      <guid${guid.attr}>${esc(guid.value)}</guid>
       <description>${cdata(desc)}</description>${it.date ? `\n      <pubDate>${it.date.toUTCString()}</pubDate>` : ''}
     </item>`;
     })
     .join('\n');
 
+  const channel = rssChannel({
+    title: '订阅源 E',
+    link: PAGE_URL,
+    description: '订阅源 E',
+    selfUrl,
+    buildDate: now,
+    pubDate: newest,
+  });
+
   return `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
-  <channel>
-    <title>订阅源 E</title>
-    <link>${esc(PAGE_URL)}</link>
-    <description>订阅源 E</description>
-    <language>zh-CN</language>
-    <lastBuildDate>${now.toUTCString()}</lastBuildDate>
-    <pubDate>${newest.toUTCString()}</pubDate>
-    <generator>rss 1.0.0</generator>
-    <ttl>60</ttl>${selfUrl ? `\n    <atom:link href="${esc(selfUrl)}" rel="self" type="application/rss+xml" />` : ''}
+${channel}
 ${itemXml}
   </channel>
 </rss>
@@ -367,6 +304,8 @@ const HELP = `gen-e.mjs
   --content-cache <文件> 正文缓存（默认 .s-e.json）
   --refresh-content  忽略缓存重抓
   --force            内容没变也重写文件
+  --no-history       不与已有输出合并历史条目
+  --max-items <n>    历史合并后的条目上限（默认 300）
   -h, --help
 `;
 
@@ -379,7 +318,7 @@ const HELP = `gen-e.mjs
   }
 
   console.log(`抓取列表页：${opts.url}`);
-  const html = await fetchText(opts.url);
+  const html = await httpText(opts.url, { decodeGb: true });
   let items = parseList(html);
   console.log(`解析到 ${items.length} 条`);
 
@@ -447,17 +386,21 @@ const HELP = `gen-e.mjs
     );
   }
 
-  let xml = buildFeed(items, { selfUrl: opts.self, guidVersion: opts.guidVersion });
-  if (opts.history) xml = mergeHistoryIntoXml(xml, opts.out, { maxItems: opts.maxItems });
-
-  if (!opts.force && fs.existsSync(opts.out) && unchangedFile(opts.out, xml)) {
+  const xml = buildFeed(items, { selfUrl: opts.self, guidVersion: opts.guidVersion });
+  const { changed, xml: outXml } = writeFeedOutput(opts.out, xml, {
+    history: opts.history,
+    maxItems: opts.maxItems,
+    force: opts.force,
+  });
+  if (!changed) {
     console.log(`内容无变化，保留原文件 ${opts.out}`);
     return;
   }
 
-  fs.writeFileSync(opts.out, xml, 'utf8');
   console.log(`最新：${items[0].dateRaw} ${items[0].title.slice(0, 40)}`);
-  console.log(`已写入 ${opts.out}（共 ${(xml.match(/<item>/g) || []).length} 条，${(xml.length / 1024).toFixed(1)} KB）`);
+  console.log(
+    `已写入 ${opts.out}（共 ${(outXml.match(/<item>/g) || []).length} 条，${(outXml.length / 1024).toFixed(1)} KB）`
+  );
 })().catch((e) => {
   console.error('运行失败：' + e.message);
   process.exit(1);

@@ -7,7 +7,7 @@ import http from 'node:http';
 import zlib from 'node:zlib';
 import fs from 'node:fs';
 import path from 'node:path';
-import { mergeHistoryIntoXml } from './lib.mjs';
+import { cdata, decodeEntities, esc, htmlToText, sleep, writeFeedOutput } from './lib.mjs';
 
 const VERSION = '1.0.0';
 const SITE = 'https://www.manhuagui.com';
@@ -18,34 +18,12 @@ const UA =
  * 基础工具
  * ------------------------------------------------------------------ */
 
-const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-
-function stripTags(s) {
-  return String(s ?? '')
-    .replace(/<script[\s\S]*?<\/script>/gi, '')
-    .replace(/<br\s*\/?>/gi, '\n')
-    .replace(/<\/(p|div|li|h\d)>/gi, '\n')
-    .replace(/<[^>]+>/g, '')
-    .replace(/&nbsp;/gi, ' ');
-}
-
-function decodeEntities(s) {
-  return String(s ?? '')
-    .replace(/&#x([0-9a-f]+);/gi, (_, h) => String.fromCodePoint(parseInt(h, 16)))
-    .replace(/&#(\d+);/g, (_, d) => String.fromCodePoint(Number(d)))
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;|&apos;/g, "'")
-    .replace(/&mdash;/g, '—')
-    .replace(/&ndash;/g, '–')
-    .replace(/&hellip;/g, '…')
-    .replace(/&nbsp;/g, ' ')
-    .replace(/&amp;/g, '&');
-}
-
+// sleep / esc / cdata / htmlToText / decodeEntities 统一由 lib.mjs 提供
 function clean(s) {
-  return decodeEntities(stripTags(s)).replace(/[ \t\u00a0]+/g, ' ').replace(/\n{3,}/g, '\n\n').trim();
+  return decodeEntities(htmlToText(s), { extra: true })
+    .replace(/[ \t\u00a0]+/g, ' ')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
 }
 
 function absUrl(href) {
@@ -53,19 +31,6 @@ function absUrl(href) {
   if (href.startsWith('//')) return 'https:' + href;
   if (/^https?:\/\//i.test(href)) return href;
   return SITE + (href.startsWith('/') ? '' : '/') + href;
-}
-
-function esc(s) {
-  return String(s ?? '')
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&apos;');
-}
-
-function cdata(s) {
-  return '<![CDATA[' + String(s ?? '').replace(/]]>/g, ']]]]><![CDATA[>') + ']]>';
 }
 
 /** 站点日期是北京时间，按 +08:00 解析 */
@@ -435,31 +400,14 @@ function writeOutputs(results, comics, opts) {
   const written = [];
 
   // 除构建时间外内容没变就不重写文件，避免定时任务产生只有 lastBuildDate 变化的提交
-  const signature = (s) =>
-    s.replace(/<lastBuildDate>[^<]*<\/lastBuildDate>/, '').replace(/<pubDate>[^<]*<\/pubDate>/, '');
-  const unchanged = (file, xml) => {
-    try {
-      return signature(fs.readFileSync(file, 'utf8')) === signature(xml);
-    } catch {
-      return false;
-    }
-  };
-
   for (const r of results) {
     if (!r.xml) continue;
     const file = multi
       ? path.join(opts.outdir, comics.length > 1 ? `feed-a-${r.comic.id}.xml` : 'feed-a.xml')
       : path.resolve(opts.out);
-    fs.mkdirSync(path.dirname(file), { recursive: true });
-    const xml = opts.history ? mergeHistoryIntoXml(r.xml, file, { maxItems: opts.maxItems }) : r.xml;
-    if (unchanged(file, xml)) {
-      console.log(`[skip] ${file}（内容无变化）`);
-      written.push(file);
-      continue;
-    }
-    fs.writeFileSync(file, xml, 'utf8');
+    const { changed } = writeFeedOutput(file, r.xml, { history: opts.history, maxItems: opts.maxItems });
     written.push(file);
-    console.log(`[write] ${file}`);
+    console.log(changed ? `[write] ${file}` : `[skip] ${file}（内容无变化）`);
   }
 
   if (opts.combined && results.some((r) => r.xml)) {
@@ -471,16 +419,10 @@ function writeOutputs(results, comics, opts) {
     }
     items.sort((a, b) => (b.date?.getTime() || 0) - (a.date?.getTime() || 0));
     const file = path.join(opts.outdir, 'feed-b.xml');
-    let xml = buildCombinedFeed(ok.map((r) => r.comic), items, opts);
-    if (opts.history) xml = mergeHistoryIntoXml(xml, file, { maxItems: opts.maxItems });
-    if (unchanged(file, xml)) {
-      console.log(`[skip] ${file}（内容无变化）`);
-      written.push(file);
-    } else {
-      fs.writeFileSync(file, xml, 'utf8');
-      written.push(file);
-      console.log(`[write] ${file}（合并 ${ok.length} 部漫画）`);
-    }
+    const xml = buildCombinedFeed(ok.map((r) => r.comic), items, opts);
+    const { changed } = writeFeedOutput(file, xml, { history: opts.history, maxItems: opts.maxItems });
+    written.push(file);
+    console.log(changed ? `[write] ${file}（合并 ${ok.length} 部漫画）` : `[skip] ${file}（内容无变化）`);
   }
   return written;
 }
@@ -495,8 +437,8 @@ function extractItems(xml) {
     const raw = get('title') || '';
     out.push({
       xml: `    <item>${m[1].trim().replace(/\n\s*/g, '\n      ')}</item>`,
-      date: get('pubDate') ? new Date(decodeEntities(get('pubDate'))) : null,
-      title: decodeEntities(raw),
+      date: get('pubDate') ? new Date(decodeEntities(get('pubDate'), { extra: true })) : null,
+      title: decodeEntities(raw, { extra: true }),
     });
   }
   return out;
@@ -753,6 +695,8 @@ const HELP = `gen-a.mjs
   --new-only        只输出新增项
   --state <文件>    状态文件（默认 .s-a.json）
   --combined        额外生成合并源 feed-b.xml
+  --no-history      不与已有输出合并历史条目
+  --max-items <n>   历史合并后的条目上限（默认 300）
   --with-cover      条目内嵌封面图
   --with-intro      条目内附简介
   --serve / --port / --interval   本地服务

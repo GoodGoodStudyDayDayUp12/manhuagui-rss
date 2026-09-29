@@ -54,10 +54,14 @@ jobs:
 
       - name: check
         run: |
+          # 只校验这次真正生成出来的文件（命中风控时文件可能不存在）
+          files=""
           for f in feed-d.xml feed-h.xml; do
-            [ -f "$f" ] || continue
-            python3 -c "import xml.dom.minidom; xml.dom.minidom.parse('$f')"
+            [ -f "$f" ] && files="$files $f"
           done
+          if [ -n "$files" ]; then
+            node check.mjs $files
+          fi
 
       - name: push
         run: |
@@ -97,3 +101,16 @@ jobs:
             git commit -m "update"
             git push
           fi
+
+      - name: status
+        if: always()
+        continue-on-error: true
+        run: |
+          # 只做提示、不阻断任务：D/H 超过 48 小时没更新就打 warning 注解
+          # （命中 B 站风控时 gen-d 会跳过本轮并保留旧内容，这里能一眼看出停了多久）
+          files=""
+          for f in feed-d.xml feed-h.xml; do
+            [ -f "$f" ] && files="$files $f"
+          done
+          [ -n "$files" ] && node check.mjs --max-age 48 $files
+          exit 0
