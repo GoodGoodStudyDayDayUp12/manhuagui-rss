@@ -24,6 +24,8 @@ import { spawnSync } from 'node:child_process';
 const FEED_RE = /^feed-[a-z]\.xml$/;
 // 这些源内容更新本身就不频繁，不做超期检查
 const QUIET = new Set(['feed-a.xml', 'feed-b.xml', 'feed-f.xml']);
+// 表格里打 ⚠ 的阈值：只是提示，不参与退出码（退出码由 --max-age 决定）
+const SHOW_STALE_HOURS = 48;
 
 const args = process.argv.slice(2);
 let maxAge = 0;
@@ -148,11 +150,9 @@ for (const f of targets) {
   const ageH = built && !Number.isNaN(built.getTime()) ? (Date.now() - built.getTime()) / 3600000 : NaN;
 
   let ageTag = Number.isFinite(ageH) ? ageH.toFixed(1) + 'h' : '?';
+  if (Number.isFinite(ageH) && ageH > SHOW_STALE_HOURS && !QUIET.has(f)) ageTag += ' ⚠';
   const isStale = maxAge > 0 && !QUIET.has(f) && Number.isFinite(ageH) && ageH > maxAge;
-  if (isStale) {
-    stale++;
-    ageTag += ' ⚠';
-  }
+  if (isStale) stale++;
 
   const ok = !errs.length && !isStale;
   if (!ok) bad++;
