@@ -61,6 +61,9 @@ jobs:
           done
           if [ -n "$files" ]; then
             node check.mjs $files
+            for f in $files; do
+              python3 -c "import xml.dom.minidom,sys; xml.dom.minidom.parse(sys.argv[1])" "$f"
+            done
           fi
 
       - name: push

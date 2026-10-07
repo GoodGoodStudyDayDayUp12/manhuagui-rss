@@ -107,9 +107,13 @@ jobs:
 
       - name: check
         run: |
-          # 结构自检（XML 完整性 / 控制字符 / 未转义的 & / guid 重复）
+          # 结构自检（XML 完整性 / CDATA 之外的未转义 & / 控制字符 / guid 重复）
           # 同时防止条目数比仓库里的版本变少，避免历史条目被覆盖丢失
           node check.mjs
+          # 再用 python 的 XML 解析器独立复核一遍良构性（node 那份是手写的启发式检查）
+          for f in *.xml; do
+            python3 -c "import xml.dom.minidom,sys; xml.dom.minidom.parse(sys.argv[1])" "$f"
+          done
 
       - name: push
         run: |

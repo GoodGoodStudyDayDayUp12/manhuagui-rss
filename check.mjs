@@ -85,12 +85,25 @@ const CTRL = /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/;
 const ZERO_WIDTH = /[\u200B-\u200D\uFEFF]/;
 const RAW_AMP = /&(?!(?:amp|lt|gt|quot|apos|#\d+|#x[0-9a-fA-F]+);)/;
 
+/**
+ * CDATA 段与 XML 注释里的裸 & 是合法的（不需要实体转义），
+ * 所以先把这些区间替换成等长空白，再在剩下的部分找未转义的 &。
+ * 否则联合早报正文里的 “Center for Technology & Statecraft” 这种情况会被误报，
+ * 进而让整个 check 步骤失败、push 被跳过。
+ */
+function maskCdataAndComments(s) {
+  return s
+    .replace(/<!\[CDATA\[[\s\S]*?\]\]>/g, (m) => ' '.repeat(m.length))
+    .replace(/<!--[\s\S]*?-->/g, (m) => ' '.repeat(m.length));
+}
+
 let bad = 0;
 let stale = 0;
 const rows = [];
 
 for (const f of targets) {
   const errs = [];
+  const warns = [];
   let xml = '';
   try {
     xml = fs.readFileSync(f, 'utf8');
@@ -114,12 +127,14 @@ for (const f of targets) {
 
   const ctrl = xml.match(CTRL);
   if (ctrl) errs.push(`含控制字符 U+${ctrl[0].charCodeAt(0).toString(16).padStart(4, '0').toUpperCase()}`);
-  if (ZERO_WIDTH.test(xml)) errs.push('含零宽字符（U+200B..200D / U+FEFF）');
+  // 零宽字符不违反 XML 规范，只是正文里可能夹带不可见字符 → 只提示，不拦提交
+  if (ZERO_WIDTH.test(xml)) warns.push('含零宽字符（U+200B..200D / U+FEFF）');
 
-  const amp = xml.match(RAW_AMP);
+  const masked = maskCdataAndComments(xml);
+  const amp = masked.match(RAW_AMP);
   if (amp) {
     const at = amp.index ?? 0;
-    errs.push(`含未转义的 & ：…${xml.slice(Math.max(0, at - 20), at + 20).replace(/\s+/g, ' ')}…`);
+    errs.push(`CDATA 之外含未转义的 & ：…${xml.slice(Math.max(0, at - 20), at + 20).replace(/\s+/g, ' ')}…`);
   }
 
   const items = [...xml.matchAll(/<item>([\s\S]*?)<\/item>/g)].map((m) => m[1]);
@@ -164,12 +179,14 @@ for (const f of targets) {
       `${String(xml.length).padStart(7)} B  构建于 ${ageTag.padEnd(8)} ${(titles[0] || '').slice(0, 34)}`
   );
   for (const e of errs) console.log(`    · ${e}`);
-  rows.push({ f, items: items.length, ageH, errs, isStale });
+  for (const w of warns) console.log(`    · (提示) ${w}`);
+  rows.push({ f, items: items.length, ageH, errs, warns, isStale });
 }
 
 const failed = rows.filter((r) => r.errs.length || r.isStale);
 for (const r of rows) {
   for (const e of r.errs) console.log(`::warning title=自检 ${r.f}::${e}`);
+  for (const w of r.warns) console.log(`::warning title=自检提示 ${r.f}::${w}`);
 }
 
 console.log('');
