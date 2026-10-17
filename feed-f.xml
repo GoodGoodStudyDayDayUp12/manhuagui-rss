@@ -5,11 +5,18 @@
     <link>https://api-docs.deepseek.com/zh-cn/updates/</link>
     <description>订阅源 F</description>
     <language>zh-CN</language>
-    <lastBuildDate>Sat, 19 Sep 2026 15:05:05 GMT</lastBuildDate>
-    <pubDate>Thu, 10 Sep 2026 01:00:00 GMT</pubDate>
+    <lastBuildDate>Sat, 17 Oct 2026 09:22:48 GMT</lastBuildDate>
+    <pubDate>Sat, 17 Oct 2026 01:00:00 GMT</pubDate>
     <generator>rss 1.0.0</generator>
     <ttl>60</ttl>
     <atom:link href="https://cdn.jsdelivr.net/gh/GoodGoodStudyDayDayUp12/manhuagui-rss@main/feed-f.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>开放自研搜索 API / DeepSeek-V4.1-Flash-1017 更新</title>
+      <link>https://api-docs.deepseek.com/zh-cn/updates/#%E6%97%B6%E9%97%B4-2026-10-17</link>
+      <guid isPermaLink="true">https://api-docs.deepseek.com/zh-cn/updates/#%E6%97%B6%E9%97%B4-2026-10-17</guid>
+      <description><![CDATA[<p><strong>开放自研搜索 API / DeepSeek-V4.1-Flash-1017 更新</strong></p><p>2026-10-17</p><hr/><h3>开放自研搜索 API</h3><p>DeepSeek 网页端与 API 端的搜索能力均由自研 DeepSeek 搜索引擎提供底层支持，稳定处理每天来自全球各地的数亿次搜索请求。DeepSeek 搜索是 AI 原生的通用搜索引擎，索引了全球千亿级网页，支持多语言搜索，实时返回高相关、高权威、高时效的优质结果。针对 SEO 作弊、GEO 操纵和低质 AIGC，我们通过严格的识别机制进行过滤，确保向用户与 LLM 呈现权威可信的信息。使用方式请参考<a href="https://api-docs.deepseek.com/zh-cn/guides/search">网页搜索与抓取指南</a>。</p><h3>DeepSeek-V4.1-Flash-1017 更新</h3><p>DeepSeek V4.1 Flash 已升级至 DeepSeek-V4.1-Flash-1017，官方网页端与 APP 模型也已同步更新至新版本。API 调用方式与价格保持不变，仍使用 <code>deepseek-flash</code> 即可访问最新模型。</p><b>性能–费用的帕累托改进</b><p>相比上一版本的 DeepSeek V4.1，新模型在各基准测试中取得了显著提升：</p><ul><li>HLE (w/o tools): 42.6 (44.0*)</li><li>Terminal-Bench 4.0: 42.3</li><li>DeepSWE v1.1: 77.0</li><li>ProgramBench: 29.1</li><li>NL2Repo-Bench: 68.2</li><li>Automation-Bench v1.0.6: 60.5</li><li>Agents&#x27; Last Exam: 35.4</li><li>Apex Bench v1.1: 72.1</li><li>Chartography (w/tools): 83.0</li><li>BabyVision (w/tools): 92.5</li><li>ZeroBench-main (w/tools): 51.0</li></ul><p>* 表示仅在 HLE 评测集的纯文本子集上进行了测试；Terminal-Bench 4.0 使用 Claude Code 框架测试，DeepSWE 使用 Mini-SWE-V2 框架测试；ZeroBench-main 使用 Pass@5 评测。</p><p>在提升性能的同时，我们还缩短了模型的任务运行时间与输出长度，让用户能够以更低成本、更快速度完成任务，在多个 Harness 下达到新的性能-费用帕累托最优。我们特别针对 DeepSeek Harness、腾讯 CodeBuddy、WorkBuddy 等平台框架进行了优化。请升级至 DeepSeek Harness 0.2.1-rc.1 及以上版本，以获得适配新版模型的最佳体验。</p><hr/><hr/><p><a href="https://api-docs.deepseek.com/zh-cn/updates/#%E6%97%B6%E9%97%B4-2026-10-17">https://api-docs.deepseek.com/zh-cn/updates/#%E6%97%B6%E9%97%B4-2026-10-17</a></p>]]></description>
+      <pubDate>Sat, 17 Oct 2026 01:00:00 GMT</pubDate>
+    </item>
     <item>
       <title>DeepSeek-V4.1-Flash 发布</title>
       <link>https://api-docs.deepseek.com/zh-cn/updates/#%E6%97%B6%E9%97%B4-2026-09-10</link>
