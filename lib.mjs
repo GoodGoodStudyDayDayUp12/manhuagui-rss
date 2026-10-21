@@ -76,6 +76,8 @@ const HTML_HEADERS = {
 };
 
 const DEFAULT_NON_RETRY = new Set([403, 404]);
+// 这些是「目标不可达」类错误：同一轮里重试几秒钟不会有任何变化，直接放弃更省时间
+const NET_FATAL = new Set(['ECONNREFUSED', 'ENOTFOUND', 'EHOSTUNREACH', 'ENETUNREACH']);
 
 /**
  * 抓取文本页面（原先 gen-e/f/g/i 各有一份几乎相同的实现）。
@@ -151,7 +153,8 @@ export async function httpText(url, opts = {}) {
       return await once();
     } catch (e) {
       last = e;
-      if (nonRetry.has(e.statusCode)) break;
+      // 状态码明确不该重试，或 DNS/连接层直接不通（几秒内不会自愈）→ 立刻放弃，别白等
+      if (nonRetry.has(e.statusCode) || NET_FATAL.has(e.code)) break;
       if (i < retries) await sleep(backoff(i));
     }
   }

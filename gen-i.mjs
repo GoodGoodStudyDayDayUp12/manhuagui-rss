@@ -34,6 +34,15 @@ import {
 const KEYWORD_DEFAULT = '肯德基';
 const BASE = 'https://s.manmanbuy.com';
 
+/**
+ * 区分“环境连不上”与“页面结构变了”：
+ * 前者（DNS 被指向本机、拒绝连接、超时）重试也没用，也不该把整条任务判成失败；
+ * 后者（HTTP 4xx/5xx、解析不到条目）说明需要人看一眼 → 仍然 exit 1。
+ */
+const NET_CODES = new Set(['ECONNREFUSED', 'ENOTFOUND', 'EAI_AGAIN', 'EHOSTUNREACH', 'ENETUNREACH', 'ETIMEDOUT', 'EPROTO']);
+const isNetErr = (e) =>
+  NET_CODES.has(e?.code) || /ECONNREFUSED|ENOTFOUND|EAI_AGAIN|EHOSTUNREACH|ETIMEDOUT|socket hang up/i.test(String(e?.message));
+
 /* ---------------- 抓取（实现见 lib.mjs httpText） ---------------- */
 
 /* ---------------- 列表解析 ---------------- */
@@ -296,6 +305,7 @@ async function runOne(opts) {
 
   let ok = 0;
   let failed = 0;
+  let netFails = 0;
   for (const f of feeds) {
     const label = f.url ? f.url : `关键词 ${f.keyword}`;
     console.log(`=== ${label} → ${path.basename(f.out)} ===`);
@@ -305,10 +315,20 @@ async function runOne(opts) {
     } catch (e) {
       failed++;
       console.error(`  [失败] ${label}：${e.message}`);
-      console.log(`::warning title=源抓取失败::${label} ${String(e.message).slice(0, 120)}`);
+      if (isNetErr(e)) {
+        // 连不上（DNS 被指向本机 / 拒绝连接）属于环境问题，不逐条刷 warning
+        netFails++;
+      } else {
+        console.log(`::warning title=源抓取失败::${label} ${String(e.message).slice(0, 120)}`);
+      }
     }
   }
   console.log(`\n完成：成功 ${ok} 个，失败 ${failed} 个`);
+  if (!ok && netFails === failed) {
+    // 整轮都是网络不可达：源站对本机/机房不可用，本轮跳过但不判失败
+    console.log(`::warning title=源站不可达::${failed} 个源全部连接失败（${netFails} 个是网络层），本轮跳过，保留上次内容`);
+    return;
+  }
   if (!ok) process.exit(1);
 })().catch((e) => {
   console.error('运行失败：' + e.message);
