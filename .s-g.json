@@ -1,140 +1,4 @@
 {
-  "https://www.zaobao.com.sg/news/china/story20261116-10007185": {
-    "fetchedAt": "2026-11-16T09:45:54.249Z",
-    "v": 31,
-    "meta": {
-      "datetime": "2026-11-16 17:40"
-    },
-    "contentHtml": "<p><img src=\"https://cassette.sphdigital.com.sg/image/zaobao/1c90e276cb07ee01af8339cff5d0701bb4396c152a5f678537c1b4e5763ff065?f=webp&amp;o=zbimg&amp;oloc=se\" alt=\"澳门特首官岑浩辉（台上左三）星期一（11月16日）在立法会发表2027年施政报告，公布将延续多项现金分享及惠民津贴措施，其中包括连续20年向合格永久居民派发现金。 （中新社）\"/></p><p>澳门特首官岑浩辉（台上左三）星期一（11月16日）在立法会发表2027年施政报告，公布将延续多项现金分享及惠民津贴措施，其中包括连续20年向合格永久居民派发现金。 （中新社）</p><p>设为谷歌新闻首选来源<h1>澳门连续20年向合格永久居民派发现金</h1><img src=\"https://cassette.sphdigital.com.sg/image/zaobao/1c90e276cb07ee01af8339cff5d0701bb4396c152a5f678537c1b4e5763ff065?f=webp&amp;o=zbimg&amp;oloc=se\" alt=\"澳门特首官岑浩辉（台上左三）星期一（11月16日）在立法会发表2027年施政报告，公布将延续多项现金分享及惠民津贴措施，其中包括连续20年向合格永久居民派发现金。 （中新社）\"/>澳门特首官岑浩辉（台上左三）星期一（11月16日）在立法会发表2027年施政报告，公布将延续多项现金分享及惠民津贴措施，其中包括连续20年向合格永久居民派发现金。 （中新社）<img src=\"data:image/webp;base64,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\"/><p>澳门特首岑浩辉发表2027年施政报告，公布将延续向合格永久居民派发现金措施。这是澳门政府连续20年推行现金分享计划。</p><p>综合香港《星岛日报》和网媒“香港01”报道，岑浩辉星期一（11月16日）在立法会发表2027年施政报告时，宣布将继续向每名永久居民派发1万元（澳门元，下同，1594新元）现金，每名非永久居民则获发6000元。</p><p>翻查过往资料发现，时任澳门特首何厚铧2008年因应金融海啸，首次推出现金分享计划，当时每名永久居民获发5000元，非永久性居民获发3000元。连同2027年施政报告宣布继续这一措施，澳门现金分享计划已连续推行20年，成为澳门社会保障体系中最具标志性的福利政策。</p><p>然而，随着公共财政资源优化，当局强调公平精准原则，在2025年首次设立申领者需符合在上一年度于澳门身处至少183天的规定，以杜绝长期脱离本地生活的违规申领，确保公帑精准投放到扎根澳门的居民身上。</p><p>在育儿与家庭支援方面，岑浩辉宣布，政府将引入阶梯式育儿津贴，向三岁以下澳门永久居民婴幼儿发放为期一至三年的津贴，首名婴儿每年1万8000元、第二名2万7000元、第三名3万6000元。</p>"
-  },
-  "https://www.zaobao.com.sg/news/china/story20261116-10007117": {
-    "fetchedAt": "2026-11-16T09:45:54.784Z",
-    "v": 31,
-    "meta": {
-      "datetime": "2026-11-16 17:29"
-    },
-    "contentHtml": "<p>设为谷歌新闻首选来源<h1>中国汽车行业协会调研17家车企供应商账款支付情况</h1><p>中国汽车工业协会将对17家重点汽车企业的供应商账款支付情况开展调研评估。</p><p>据财联社报道，中国汽车工业协会星期一（11月16日）透露，将对17家重点汽车企业的供应商账款支付情况开展调研评估，推动汽车企业规范供应商账款支付。</p><p>此次调研评估工作每年开展一次，采取“车企定期报送+样本供应商抽查”相结合的方式进行。汽车企业需于每年1月31日前报送上一年度账款支付情况报告，并于7月31日前报送当年上半年账款支付情况报告。</p><p>同时，协会将从每家企业的供应商中随机抽取样本供应商，数量不少于15家，通过资料核查、现场调研等方式确认报送信息的真实性。</p><p>评估内容包括企业账款支付管理制度和数字化系统建设情况；中小企业账款支付账期是否不超过60天、是否全部采用现金支付；非中小企业账款支付账期是否符合60天要求，以及现金和银行承兑汇票支付比例是否不低于80%等。</p>"
-  },
-  "https://www.zaobao.com.sg/news/china/story20261116-10007004": {
-    "fetchedAt": "2026-11-16T09:45:55.322Z",
-    "v": 31,
-    "meta": {
-      "datetime": "2026-11-16 17:20"
-    },
-    "contentHtml": "<p><img src=\"https://cassette.sphdigital.com.sg/image/zaobao/c871c99ce660acce37394406b7e8f17397565e4c9d13d3ca2c9cb5a0fd51b406?f=webp&amp;o=zbimg&amp;oloc=se\" alt=\"中国股市星期一（11月16日）收低，逼近2025年7月以来的最低点。图为上交所标识，摄于9月28日。 （REUTERS）\"/></p><p>中国股市星期一（11月16日）收低，逼近2025年7月以来的最低点。图为上交所标识，摄于9月28日。 （REUTERS）</p><p>路透社报道，中国蓝筹股沪深300指数和上证综合指数星期一均收跌0.9%，香港恒生指数则上涨0.5%。</p><p>此前一周，亚洲科技股经历剧烈震荡，英伟达首席执行官黄仁勋接连爆出丑闻后离职令市场措手不及。本周英伟达将公布业绩，美国AI公司Anthropic也将进行首次公开募股（IPO），市场将借此观察AI带动的牛市能否进一步扩大。</p><p>具体来看，中国AI硬件股大幅下跌。5G通信指数大跌7.5%，跌至一年来最低水平；科技股为主的科创50指数下挫5.2%。AI数据中心高速光模块主要供应商中际旭创股价重挫12.3%。</p><p>分析指出，英伟达的变局可能成为中国晶片制造商发展的一个转折点。若华盛顿因这场风波而收紧出口管制，可能加快中国对国产AI晶片和计算基础设施的投资。</p><p>另一方面，中国经济10月再现疲软迹象，工业生产增速放缓，消费持续低迷。中国统计局星期一公布，10月规模以上工业增加值同比实际增长4.8%，社会消费品零售总额同比增0.4%，两者均低于预期，投资持续下降。</p><p>今年以来，沪深300指数累计下跌14%。不过，在A股普遍下跌之际，沪深300金融指数上涨1.5%，必需消费品板块上涨1.2%。</p>"
-  },
-  "https://www.zaobao.com.sg/news/china/story20261116-10006763": {
-    "fetchedAt": "2026-11-16T09:45:55.859Z",
-    "v": 31,
-    "meta": {
-      "datetime": "2026-11-16 16:58"
-    },
-    "contentHtml": "<p><img src=\"https://cassette.sphdigital.com.sg/image/zaobao/bc6b25e4c0c128378a44e33f7e616b28deb8ec2601b6c8263343c69824fcf6de?f=webp&amp;o=zbimg&amp;oloc=se\" alt=\"美国白宫发布的消息显示，总统特朗普这次访华行，将与中国国家主席习近平会晤，之后再参加中美俄元首会面。图为特朗普（右前）和夫人梅拉尼娅（右后）今年9月在美国马里兰州圣安德鲁斯联合基地迎接到访中国国家主席习近平（左前）和夫人彭丽媛（左后）。 （路透社档案照）\"/></p><p>美国白宫发布的消息显示，总统特朗普这次访华行，将与中国国家主席习近平会晤，之后再参加中美俄元首会面。图为特朗普（右前）和夫人梅拉尼娅（右后）今年9月在美国马里兰州圣安德鲁斯联合基地迎接到访中国国家主席习近平（左前）和夫人彭丽媛（左后）。 （路透社档案照）</p><p>白宫上星期五（11月13日）最先发布中美俄元首峰会消息。</p><p>俄罗斯官媒塔斯社上星期六（11月14日）引述总统新闻秘书佩斯科夫证实，俄罗斯总统普京星期四（11月19日）将于深圳亚太经济合作组织（APEC）领导人非正式会议期间，在场边与中国国家主席习近平和美国总统特朗普举行三方会晤。</p><p>中国外交部星期一（11月16日）确认，中俄美元首会晤将于星期四在深圳举行。</p><p>外交部发言人毛宁星期一在例行记者会应询时说，这是中俄美三国元首历史上首次面对面会晤，将围绕维护世界和平、促进大国关系战略稳定深入交换意见，具有开创性意义。</p><p>毛宁也说，当前形势下，三国肩负着合作应对全球性挑战、促进世界和平稳定的重要责任。中俄美加强沟通，管控分歧，稳定关系，符合三国利益，也是国际社会的期待，有利于稳定世界局势，推动对话合作。</p><p>白宫随行记者团星期一在X平台发布消息，介绍特朗普这次出访菲律宾和中国的具体行程。特朗普星期一启程前往菲律宾，将于星期二（11月17日）抵达马尼拉，期间将出席美国与亚细安领导人峰会等活动。</p><p>特朗普将于星期三（11月18日）下午离开马尼拉，续程前往深圳。他将在星期四于深圳国际交流中心参加APEC领导人全体会议，然后在麒麟山庄先与习近平进行双边会晤，之后再参与中美俄元首会面。 </p>"
-  },
-  "https://www.zaobao.com.sg/news/china/story20261116-10006469": {
-    "fetchedAt": "2026-11-16T09:45:56.620Z",
-    "v": 31,
-    "meta": {
-      "datetime": "2026-11-16 16:23"
-    },
-    "contentHtml": "<p><img src=\"https://cassette.sphdigital.com.sg/image/zaobao/23960a74b831884fb54a4b1010cfbe6594679f98a12dbc6de081d9872f7ac6df?f=webp&amp;o=zbimg&amp;oloc=se\" alt=\"寻求连任的国民党籍台北市长蒋万安上周六（11月14日）在台北出席选举造势活动。TVBS发布最新民调显示，他以46％的支持度，小幅领先民进党参选人沈伯洋的44％，双方差距仅两个百分点。 （法新社）\"/></p><p>寻求连任的国民党籍台北市长蒋万安上周六（11月14日）在台北出席选举造势活动。TVBS发布最新民调显示，他以46％的支持度，小幅领先民进党参选人沈伯洋的44％，双方差距仅两个百分点。 （法新社）</p><p>据TVBS新闻网报道，TVBS民调中心星期一（11月16日）公布选前最后一份台北市长选情民调。民调显示蒋万安支持度为46％，沈伯洋为44%，两人仅差两个百分点。</p><p>交叉分析显示，在台北市地区支持度分布上，沈伯洋只在中山大同区和士林北投区取得优势；蒋万安则在其他四个分区上领先，分别是松山信义区、大安文山区、内湖南港区，以及中正万华区。</p><p>民调分析，与10月底电视辩论后的调查相比，蒋万安在松山信义区的领先，从四个百分点扩大至10个百分点，在中山大同区落后的幅度由九个百分点缩小至五个百分点；沈伯洋在中正万华区及大安文山区缩小与蒋万安的差距，分别落后三个和五个百分点；在士林北投区的领先幅度则从五个百分点扩大至七个百分点。</p><p>蒋万安和沈伯洋10月31日举行首场电视辩论。主办单位之一的TVBS隔天公布辩论后电话调查，蒋万安以46%支持率领先沈伯洋42%，差距为四个百分点；另有47%受访者认为沈伯洋辩论表现较佳，40%认为蒋万安较佳。</p><p>此次民调在上周末（14日至15日）进行，采市话与手机并用的双底册抽样设计，共完成1331份有效样本。在95%的信心水准下，抽样误差为正负2.7个百分点。</p><p>另一方面，星期一公布的另外两份台北市长选情民调，显示沈伯洋的支持度领先蒋万安。</p><p>其中，政治立场亲绿的信民协会民调显示，沈伯洋以48.6%的支持度领先蒋万安的33.8%，双方差距14.8个百分点。</p><p>《锋灿传媒》公布的民调显示，沈伯洋以44.7%的支持度小幅领先蒋万安的43.0%，双方差距仅1.7个百分点。</p><p>“九合一”地方选举将于11月28日投票。台湾中央选举委员会此前提醒，从星期三（18日）零时起至投票结束前，不得发布报道、散布评论或引述任何有关选举的民意调查。</p>"
-  },
-  "https://www.zaobao.com.sg/news/china/story20261116-10006464": {
-    "fetchedAt": "2026-11-16T09:45:57.329Z",
-    "v": 31,
-    "meta": {
-      "datetime": "2026-11-16 16:20"
-    },
-    "contentHtml": "<p><img src=\"https://cassette.sphdigital.com.sg/image/zaobao/b9dec21400db005628fcc9cce0c00d787bf335fa5c604a729c1b6290ca76b666?f=webp&amp;o=zbimg&amp;oloc=se\" alt=\"知名高校北京大学一款售价399元（人民币，约77新元）、含绒量达90%的羽绒服近期在中国网络走红。 （互联网）\"/></p><p>知名高校北京大学一款售价399元（人民币，约77新元）、含绒量达90%的羽绒服近期在中国网络走红。 （互联网）</p><p>《北京日报》星期一（11月16日）报道，北大校内文创店内游客源源不断，服饰货架前的通道尤其拥挤，一直有游客举着社媒上的热门帖子咨询：“白色羽绒服还有吗？”</p><p>工作人员则一遍遍解释：“这件新款羽绒服正在补货，预计12月底到货，可以关注北大文创线上平台获取最新消息。”</p><p>据介绍，这件羽绒服填充物为鹅绒，绒子含量达90%。有消费者称，其充绒量和保暖性能与市面上一些热销品牌相当，但售价却只有其一半左右，性价比非常突出。</p><p>话题“北大399元羽绒服全网刷屏”星期一冲上微博热搜第一。据悉，羽绒服一经推出便迅速售罄，校内文创店的白色款率先断货，目前仅剩黑色和紫色款。</p><p>综合《新民晚报》、温度新闻等报道，不少抢到第一波现货的学生发布了“买家秀”，评论里求代购的呼声一片。据悉，大量涌入北大文创微信小程序抢购的网民把小程序挤崩，不少用户反馈页面打不开、没法下单。</p><p>北大文创客服回应，这两天访问人数太多，问题已经同步给技术人员，稍等一段时间就能恢复。</p><p>报道引述分析称，除了自带名校光环，高校文创也解决了消费市场里的“信任难题”——一所高校用多年来积累的社会声誉为文创做背书，消费者不需要花大量精力去对比测评，就对产品品质多了一份放心。</p><p>有网民留言称，这款羽绒服使用鹅绒，“用这么好”；也有人说：“看看吧，根本不缺市场，缺的只是良心商家。”</p>"
-  },
-  "https://www.zaobao.com.sg/news/china/story20261116-10006390": {
-    "fetchedAt": "2026-11-16T09:45:58.098Z",
-    "v": 31,
-    "meta": {
-      "datetime": "2026-11-16 16:11"
-    },
-    "contentHtml": "<p>中国外交部发言人毛宁星期一（11月16日）在例行记者会上应询时说，中方一贯认为人工智能是全人类的共同财富，在这个领域不应当以意识形态划线或者是搞封闭排他的小圈子，各方应当携手促进人工智能的发展和治理，推动人工智能服务全人类。</p><p>对于相关协议的签署会否影响中美元首会晤，毛宁表示，关于中美元首会晤，双方保持着沟通。</p><p>英国《金融时报》星期天（11月15日）引述美国负责经济事务的副国务卿赫尔伯格（Jacob Helberg）报道，美国及盟友已达成协议，将共同识别并保护被认为容易受到中国影响的AI技术和供应链。</p><p>据彭博社转述，日本、澳大利亚、以色列、英国、韩国、印度、卡塔尔和阿拉伯联合酋长国已签署协议，德国、瑞典、荷兰及欧盟委员会预计将在下周签署。</p><p>上述协议是美国主导的“硅和平”（Pax Silica）倡议的一部分，旨在中美竞争日益加剧之际，加强各国在AI供应链方面的合作。</p>"
-  },
-  "https://www.zaobao.com.sg/news/china/story20261116-10006336": {
-    "fetchedAt": "2026-11-16T09:45:58.859Z",
-    "v": 31,
-    "meta": {
-      "datetime": "2026-11-16 16:03"
-    },
-    "contentHtml": "<p><img src=\"https://cassette.sphdigital.com.sg/image/zaobao/c2dc9ac6933cf8c592966ba9f9fe27c8689cdfec2454f27d3483eb8839e6e240?f=webp&amp;o=zbimg&amp;oloc=se\" alt=\"张爱玲的两部小说《赤地之恋》和《秧歌》，在中国社交网站豆瓣的词条近日被发现下架。 （豆瓣）\"/></p><p>张爱玲的两部小说《赤地之恋》和《秧歌》，在中国社交网站豆瓣的词条近日被发现下架。 （豆瓣）</p><p>目前，在豆瓣网站搜索这两部作品，已无法找到张爱玲的相关书籍条目，而此前的豆瓣书籍链接也显示“这个页面不在了”。下架前，《秧歌》在豆瓣的评分为9.4分，共有1837人参与评分；《赤地之恋》的评分则为8.5分，共有783人参与评分。</p><p>两部作品均为张爱玲旅居香港期间创作的小说，具有政治色彩，主要描写1950年代初中国社会的政治运动及其对普通人的影响。</p><p>《赤地之恋》以中国土地改革、“三反”运动和朝鲜战争为背景，讲述大学毕业生刘荃满怀理想投身新社会建设，却在目睹土改暴力、政治斗争和战争的残酷后，理想逐渐幻灭的故事。</p><p>1954年出版的《秧歌》则聚焦土地改革后的中国农村，讲述农民金根和妻子月香一家在饥饿与贫困中挣扎求生的故事。小说通过官方宣传的农村丰收景象与农民食不果腹的现实之间的反差，描写政治运动下底层百姓的苦难。</p><p>上个月，张爱玲罕见演讲原声录音在中文互联网热传。在演讲中，张爱玲谈了许多与文学相关的内容，此外，她还提到中共的文艺路线、1949年后文艺创作环境的变化、五四运动的影响等。</p>"
-  },
-  "https://www.zaobao.com.sg/news/china/story20261116-10006034": {
-    "fetchedAt": "2026-11-16T09:45:59.630Z",
-    "v": 31,
-    "meta": {
-      "datetime": "2026-11-16 15:35"
-    },
-    "contentHtml": "<p><img src=\"https://cassette.sphdigital.com.sg/image/zaobao/824a6883b28f57b2654b21495b05aaec7d1291edb4983837f72820b76f4addd1\" alt=\"中俄美元首会晤将于星期四在深圳举行\"/></p><p>中俄美元首会晤将于星期四在深圳举行</p><p>中国外交部发言人毛宁星期一主持例行记者会。她回应有关中方发布中俄美元首深圳会晤的提问时说，这是中俄美三国元首历史上首次面对面会晤，将围绕维护世界和平、促进大国关系战略稳定深入交换意见，具有开创性意义。</p><p>毛宁称，中俄美都是联合国创始会员国和安理会常任理事国。历史上三国曾并肩赢得世界反法西斯战争的胜利。</p><p>毛宁也说，当前形势下，三国肩负着合作应对全球性挑战、促进世界和平稳定的重要责任。中俄美加强沟通，管控分歧，稳定关系，符合三国利益，也是国际社会的期待，有利于稳定世界局势，推动对话合作。</p><p>中国外交部发言人星期一上午宣布，中国国家主席习近平将于星期四同俄罗斯总统普京、美国总统特朗普在深圳举行中俄美元首会晤。</p><p>美国白宫上星期五（11月13日）率先公布有关会晤消息。俄罗斯官媒塔斯社上星期六（11月14日）引述总统新闻秘书佩斯科夫证实，普京星期四将于深圳亚太经济合作组织（APEC）领导人非正式会议期间，在场边与习近平和特朗普举行三方会晤。</p><p>外界预期，中美俄元首可能在会晤中讨论乌克兰战争、伊朗战争、削减核武器、人工智能等全球热点问题。</p>"
-  },
-  "https://www.zaobao.com.sg/news/china/story20261116-10005969": {
-    "fetchedAt": "2026-11-16T09:46:00.388Z",
-    "v": 31,
-    "meta": {
-      "datetime": "2026-11-16 15:31"
-    },
-    "contentHtml": "<p><img src=\"https://cassette.sphdigital.com.sg/image/zaobao/5226d9218cb96bd3d3ac059f9d8f0027bc68f20f91315fed2ef2b9d8ef198112?f=webp&amp;o=zbimg&amp;oloc=se\" alt=\"中国驻美大使谢锋星期一（11月16日）应邀向第七届香港中美论坛发表视频致辞。 （中国驻美国大使馆官网）\"/></p><p>中国驻美大使谢锋星期一（11月16日）应邀向第七届香港中美论坛发表视频致辞。 （中国驻美国大使馆官网）</p><p>设为谷歌新闻首选来源<h1>谢锋希望香港充分发挥独特优势 打造中美合作共赢新高地</h1><img src=\"https://cassette.sphdigital.com.sg/image/zaobao/5226d9218cb96bd3d3ac059f9d8f0027bc68f20f91315fed2ef2b9d8ef198112?f=webp&amp;o=zbimg&amp;oloc=se\" alt=\"中国驻美大使谢锋星期一（11月16日）应邀向第七届香港中美论坛发表视频致辞。 （中国驻美国大使馆官网）\"/>中国驻美大使谢锋星期一（11月16日）应邀向第七届香港中美论坛发表视频致辞。 （中国驻美国大使馆官网）<img src=\"data:image/webp;base64,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\"/><p>中国驻美大使谢锋说，他希望香港发挥独特优势，打造中美合作共赢新高地。</p><p>据中国驻美国大使馆官网消息，谢锋星期一（11月16日）应邀向第七届香港中美论坛发表视频致辞时说，今年是中美关系的“大年”，中国国家主席习近平和美国总统特朗普半年内实现国事互访，创造了中美高层交往的历史，也为中美关系发展带来新机遇。</p><p>谢锋结合论坛主题“明天会比今天更好”分享三点思考：一要遵循元首战略引领，开创行稳致远的明天。北京会晤确立中美建设性战略稳定关系新定位，华盛顿会晤以“尊重、公平、对等”进一步丰富新定位内涵，为中美探索相处之道提供了更明确的战略指引。</p><p>他认为，中美双方应相向而行，加快将愿景转化为实景，拉长合作清单，压缩问题清单，跨越“修昔底德陷阱”，走出大国正确相处之道，为中美人民带来更多福祉，也为动荡不安的世界注入稳定性和确定性。</p><p>二要织紧互利合作纽带，开创共同繁荣的明天。他相信，中美利益深度交融，相互成就、合作共赢是唯一正确选择。希望香港充分发挥“超级联系人”和“超级增值人”的独特优势，在中美合作的广阔天地中深耕厚植、开拓进取，打造中美合作共赢的新高地。</p><p>三要多架民心相通桥梁，开创充满希望的明天。谢锋希望中美交流基金会和各界朋友携手努力，进一步促进两国人民双向奔赴，为中美关系发展汇聚源头活水、激发不竭动能。</p><p>这次论坛由中美交流基金会和中国人民对外友好协会在香港共同举办，中美及有关国家前政要、战略界、工商界、智库等代表300余人参加。</p>"
-  },
-  "https://www.zaobao.com.sg/news/china/story20261116-10005926": {
-    "fetchedAt": "2026-11-16T09:46:01.158Z",
-    "v": 31,
-    "meta": {
-      "datetime": "2026-11-16 15:24"
-    },
-    "contentHtml": "<p><img src=\"https://cassette.sphdigital.com.sg/image/zaobao/2e91fd22bb2f872edc93d27caeab60bc08e908415044972fb1367d9627f811ae?f=webp&amp;o=zbimg&amp;oloc=se\" alt=\"中国科技巨头阿里巴巴星期一（11月16日）发布新一代旗舰大模型Qwen4-Max。 （路透社）\"/></p><p>中国科技巨头阿里巴巴星期一（11月16日）发布新一代旗舰大模型Qwen4-Max。 （路透社）</p><p>综合“阿里研究院”微信公众号、路透社等报道，阿里巴巴发布新一代基座大模型Qwen4-Max，总参数2.4T。官方称，Qwen4-Max以更少的Token消耗实现了更高的性能，在智能体和编程等关键能力项上持续进化。</p><p>据介绍，新一代大模型可胜任广泛的创意及专业工作，包括3D建模、游戏开发、精密制造、金融、法律、医疗保健，以及前沿科学研究。</p><p>中国科技企业在全球开源权重人工智能（AI）模型领域占据重要地位，目前正展开激烈竞争，力求打造性能更强大的系统，同时避免运行成本过高。</p><p>阿里巴巴说，在网络安全方面，公司按任务的具体用途筛选，保留用于漏洞验证、检测和修复等防御任务的数据，剔除用于提升攻击能力等进攻任务的数据。</p><p>公司称，模型在规避注入、内存安全和越权访问等核心风险上表现尤为突出，能显著减少默认生成的代码漏洞，协助开发者从源头压缩系统受攻击面。</p><p>阿里内部安全专家审查发现，Qwen4-Max的网络安全防御能力大幅提升，针对攻击性用途的防护能力也显著增强。阿里也说，尚未发现模型产生大规模网络安全风险的能力。</p><p>近几个月来，中国AI模型开发商在发布新模型时，越来越多地披露安全测试情况。此举正值全球对AI“失控”风险的担忧日益加剧，美国科技公司的AI代理此前多次被曝出现失控行为，与中国科技巨头腾讯有关的一款AI代理也于10月被指出现类似问题。</p>"
-  },
-  "https://www.zaobao.com.sg/news/china/story20261116-10005816": {
-    "fetchedAt": "2026-11-16T09:46:01.915Z",
-    "v": 31,
-    "meta": {
-      "datetime": "2026-11-16 15:09"
-    },
-    "contentHtml": "<p><img src=\"https://cassette.sphdigital.com.sg/image/zaobao/b5eba842f8dc30ffaefe3d2b22505948b0925fc4e256f8640fb79077ef22ee92\" alt=\"姆巴佩言论在华引反弹后 运动品牌昂跑称正倾听与学习\"/></p><p>姆巴佩言论在华引反弹后 运动品牌昂跑称正倾听与学习</p><p>据虎扑足球、《星岛日报》等报道，效力于巴塞罗那的亚马尔当地时间星期天（11月15日）在Instagram账号转发了一段改编自美国动画《南方公园》（South Park）的短视频。</p><p>这段视频原本意在讽刺部分白人少女混淆中国、韩国等亚洲国家的文化与语言，但其中出现“ching chong”等歧视性字眼，并通过模仿亚洲人口音、丑化亚裔形象等方式呈现。</p><p>“Ching chong”是英语中针对华人及其他东亚裔人士的种族歧视用语，通过模仿汉语发音和声调来嘲弄华人语言及文化。</p><p>据报道，亚马尔约三小时后取消转发，但截至星期一（11月16日）下午，他本人及巴塞罗那俱乐部均未公开回应。</p><p>事件在中国互联网引发讨论，有网民要求亚马尔道歉，也有人要求与他合作的品牌终止代言关系。</p><p>此前，皇家马德里球星姆巴佩因发表涉华争议言论，引发中国舆论批评，多家中国品牌随后宣布与他终止合作，姆巴佩及皇家马德里也先后公开道歉。</p><p>此次亚马尔卷入争议后，部分皇马球迷将两起事件相提并论，质疑两名球员受到的舆论批评程度为何不同。</p><p>不过也有媒体怀疑，亚马尔是否真的转发了争议视频。行业媒体懂球帝称，目前仅有一张网传截图显示亚马尔的转贴，并没有其他证据，截图真实性存疑。 </p>"
-  },
-  "https://www.zaobao.com.sg/news/china/story20261116-10005605": {
-    "fetchedAt": "2026-11-16T09:46:02.674Z",
-    "v": 31,
-    "meta": {
-      "datetime": "2026-11-16 14:45"
-    },
-    "contentHtml": "<p><img src=\"https://cassette.sphdigital.com.sg/image/zaobao/1f886ba4c60fd26a29c49cbe3209016a4d353d32fe9f699455bb052d69b7ac50\" alt=\"亲绿民调：沈伯洋支持度领先蒋万安14.8个百分点\"/></p><p>亲绿民调：沈伯洋支持度领先蒋万安14.8个百分点</p><p>综合《自由时报》、Newtalk新闻、三立新闻网报道，《锋灿传媒》星期一公布的选情民调显示，沈伯洋以44.7%的支持度，小幅领先蒋万安的43.0%，双方差距仅1.7个百分点，另有12%的受访者未表态。</p><p>在表示有投票意愿的受访者中，沈伯洋以46.4%的支持度领先蒋万安的44.1%，差距为2.3个百分点。至于一定会投票的受访者，沈伯洋获得49.6%的支持，蒋万安则为43.8%。</p><p>从政党倾向来看，94.2%的民进党支持者表态支持沈伯洋，93.3%的国民党支持者及81.2%的民众党支持者则支持蒋万安。至于政党中立的选民，蒋万安获40.7%支持，高于沈伯洋的28.6%。</p><p>《锋灿传媒》民调委托台大政治系教授张佑宗规划设计，采市话与网络混合调查，对象为设籍台北市且具投票权的选民。调查于11月4日至9日进行，共取得有效样本2026份，其中市话1008份、网络1018份。在95%信赖水准下，整体抽样误差为正负2.18个百分点。</p><p>另一方面，信民协会同一天公布的民调显示，沈伯洋以48.6%的支持度，大幅领先蒋万安的33.8%，双方差距14.8个百分点。</p><p>不过，从得票率推估来看，如果现在进行投票，在不同投票率下推估沈伯洋得票率48%至52%，蒋万安得票率48.3%至52.2%，沈伯洋最多领先3.7%，蒋万安最多领先4.2%。</p><p>“九合一”地方选举将于11月28日投票。台湾中央选举委员会此前提醒，从星期三（11月18日）零时起至投票结束前，不得发布报道、散布评论或引述任何有关选举的民意调查。</p>"
-  },
-  "https://www.zaobao.com.sg/news/china/story20261116-10005548": {
-    "fetchedAt": "2026-11-16T09:46:03.379Z",
-    "v": 31,
-    "meta": {
-      "datetime": "2026-11-16 14:38"
-    },
-    "contentHtml": "<p><img src=\"https://cassette.sphdigital.com.sg/image/zaobao/d0d0dcfa185161354810989162274ac195eec7c778dd4f897ff900588384b980?f=webp&amp;o=zbimg&amp;oloc=se\" alt=\"中国总理李强（左二）星期一（11月16日）在出席亚细安-中国领导人会议期间准备拍集体照时，与菲律宾总统小马可斯（右二）并列站在台上。 （法新社）\"/></p><p>中国总理李强（左二）星期一（11月16日）在出席亚细安-中国领导人会议期间准备拍集体照时，与菲律宾总统小马可斯（右二）并列站在台上。 （法新社）</p><p>据新华社报道，李强星期一（11月16日）在菲律宾马尼拉举行的中国－亚细安（中国称东盟）领导人会议上发表讲话时说，过去五年，国际上单边主义、保护主义逆流涌动，地缘冲突此起彼伏。在这样的背景下，中国－亚细安合作逆势而上，取得令人振奋的成绩。双方去年贸易额已突破1万亿美元（1.29万亿新元），比2021年增长20.1%。截至目前，双向投资额累计超过5000亿美元，比五年前增长50%以上。</p><p>李强强调，五年的成绩来之不易，由此可看出中国和亚细安国家的悠久友好交往未因国际局势动荡褪色，反在共迎挑战过程中，磨砺得更成熟坚韧。中国和亚细安长期支持和推动经济全球化和区域一体化，在面对国际各类经贸限制大幅增多，仍坚定维护多边主义、促进自由贸易，不断做大合作蛋糕。</p><p>他提到，当今世界纷纷攘攘，中国和亚细安更应当团结一致，排除干扰，共建更为紧密的中国－亚细安命运共同体，为整个地球村的发展繁荣注入更多稳定性确定性。</p><p>李强指出，国际形势越是复杂严峻，中国和亚细安越要增进战略互信，坚持通过对话协商妥处分歧，共同反对外部干涉，维护地区和平稳定。中方期待早日达成“南中国海行为准则”，为实现南中国海长治久安提供坚实制度保障。</p><p>他说，中国与亚细安应以自贸区3.0版升级议定书生效为契机，深化产供链合作，加快铁路、公路等基础设施“硬联通”，加强机制、标准、规则等“软联通”。中方欢迎建立中国－亚细安能源合作伙伴关系和能源部长会议机制，愿同亚细安办好明年人工智能合作年，开展“人工智能+”合作，探讨同《亚细安数字经济框架协议》对接，打造区域经济高质量发展的强劲引擎。</p><p>李强最后提出，中方将继续向中国－亚细安合作基金注资，愿同亚细安加强减贫、防灾减灾、粮食安全等合作，促进本地区可持续发展。中国－亚细安数字学院明年将向亚细安国家提供100个全额奖学金名额，中国－亚细安妇幼健康合作中心愿在未来三年同亚细安国家合作培养1000名专业人才，欢迎各方积极参与。中方愿同亚细安加强执法合作，共同打击跨国犯罪。</p>"
-  },
-  "https://www.zaobao.com.sg/news/china/story20261116-10005423": {
-    "fetchedAt": "2026-11-16T09:46:04.143Z",
-    "v": 31,
-    "meta": {
-      "datetime": "2026-11-16 14:19"
-    },
-    "contentHtml": "<p><img src=\"https://cassette.sphdigital.com.sg/image/zaobao/e5d9bf2cfdcfc1a6786d008d08bc40ed467abb3d58b3a5c8178d86649e459e53?f=webp&amp;o=zbimg&amp;oloc=se\" alt=\"中国国务院新闻办公室在北京举行新闻发布会，国家统计局新闻发言人、总经济师、国民经济综合统计司司长付凌晖（中），国家统计局新闻发言人、国民经济综合统计司副司长王冠华（右一）星期一（11月16日）介绍2026年10月份国民经济运行情况，并答记者问。 （中新社）\"/></p><p>中国国务院新闻办公室在北京举行新闻发布会，国家统计局新闻发言人、总经济师、国民经济综合统计司司长付凌晖（中），国家统计局新闻发言人、国民经济综合统计司副司长王冠华（右一）星期一（11月16日）介绍2026年10月份国民经济运行情况，并答记者问。 （中新社）</p><p>中国国家统计局新闻发言人、国民经济综合统计司副司长王冠华星期一（11月16日）在国新办新闻发布会上表示，要客观、辩证地看待10月份部分指标增速的回落。</p><p>“受经济自身运行特点、季节性因素、节假日安排以及上年对比基数等因素的影响，月度指标出现波动是经济运行中比较常见的现象。”</p><p>王冠华说，今年10月份部分指标回落一定程度上受到了中秋错月因素的影响，今年中秋节在9月份，而去年是在10月份，这意味着一些节日商品和时令食品的需求，以及居民的部分旅游、探亲、休闲娱乐需求在9月份提前释放，客观上会对10月份服务业消费等指标形成一定下拉影响。</p><p>她说，“不能单从一个月来判断经济走势，应该拉长时间，从更多的维度和角度来看。既要看当月，也要看累计；既要看总量，更要看结构；既要纵向看，也要横向看，放在全球经济的坐标中来看。”</p><p>王冠华表示，四季度，中国经济平稳运行的态势没有改变，供需两端的指标都比较平稳。</p><p>她指出，从其他一些相关指标来看，城镇调查失业率稳定，物价温和上涨，能源供给充足，结构调整、转型升级继续取得新的进展。这些情况都表明，中国经济在复杂环境中保持了总体稳定的发展势头。</p><p>同时，王冠华也说，从发展支撑因素看，在新旧动能转换过程中，一些传统行业面临着转型调整的压力，同时也有一大批的新产业、新业态、新模式冒出来、跑起来，这种新旧动能的彼长此消、接力转换，正是当前中国经济最为鲜明的特征。</p><p>王冠华说，也要看到，经济发展当中确实面临着一些困难和挑战，需要采取有针对性的措施加以解决。但是在应对挑战、攻坚克难的过程中，支撑高质量发展的有利条件和独特优势也在不断巩固拓展。随着各项宏观政策协同发力不断显效，中国经济有望延续向新向优向好的发展态势，实现全年预期目标有支撑、有条件。</p><p>10月份，中国规模以上工业增加值同比实际增长4.8%，社会消费品零售总额同比增0.4%，均低于预期。投资方面，今年前10个月，固定资产投资同比下降8.1%，房地产开发投资下降21.6%。</p>"
-  },
-  "https://www.zaobao.com.sg/news/china/story20261116-10005300": {
-    "fetchedAt": "2026-11-16T09:46:04.921Z",
-    "v": 31,
-    "meta": {
-      "datetime": "2026-11-16 14:03"
-    },
-    "contentHtml": "<p><img src=\"https://cassette.sphdigital.com.sg/image/zaobao/1f886ba4c60fd26a29c49cbe3209016a4d353d32fe9f699455bb052d69b7ac50\" alt=\"亲绿民调：沈伯洋支持度领先蒋万安14.8个百分点\"/></p><p>亲绿民调：沈伯洋支持度领先蒋万安14.8个百分点</p><p>综合《联合报》和《自由时报》报道，黄国昌星期一（11月16日）上午陪同民众党三芦新北市议员候选人陈彦廷的车队扫街。他被问及蒋万安是否会出席星期六（21日）晚的民众党造势活动，并与民众党前主席柯文哲同台时说，相信最近民众党跟蒋万安之间的合作跟互动都非常自然和融洽。</p><p>黄国昌也证实蒋万安将出席造势活动，并呼吁支持者星期六晚齐聚台北市政府府前广场。他说，这是这场选战最后一次的全台大造势，希望借此提振支持者士气，为候选人加油。</p><p>民众党将于星期六晚在台北市政府前广场举办以“决胜之夜——民众相挺，台湾必赢！”为主题的造势活动，柯文哲、黄国昌及民众党候选人都将出席。</p><p>另一方面，对于最新台北市长民调显示，民进党参选人沈伯洋的支持度胜过蒋万安，黄国昌说，选前民调满天飞，民调已经成为选战宣传工具，不知道该相信哪一份。</p><p>黄国昌还说，最重要的是民众出来投票，用手中的选票选出自己认为最优秀的候选人。</p><p>《锋灿传媒》星期一公布台北市长最新民调，沈伯洋以44.7%的支持度，领先蒋万安的43%。</p><p>另一方面，信民协会最新民调显示，沈伯洋以48.6%的支持度，大幅领先蒋万安的33.8%，双方差距14.8个百分点。</p><p>台湾“九合一”地方选举将于11月28日投票。</p>"
-  },
-  "https://www.zaobao.com.sg/news/china/story20261116-10004995": {
-    "fetchedAt": "2026-11-16T09:46:05.682Z",
-    "v": 31,
-    "meta": {
-      "datetime": "2026-11-16 13:54"
-    },
-    "contentHtml": "<p><img src=\"https://cassette.sphdigital.com.sg/image/zaobao/bc5648bdf89127291b222eb7f51f93e223d3e3d4ad2d89503cdc3677e036fa1a\" alt=\"掉出GDP十强省后 湖南省领导动作频频抓经济\"/></p><p>掉出GDP十强省后 湖南省领导动作频频抓经济</p><p>“湘超”联赛娄底赛区组委会星期一（11月16日）发布情况通报，星期天（11月15日），“湘超”联赛四分之一决赛娄底队主场对阵衡阳队。开赛之前，个别人员在场外呼喊不文明口号、展示侮辱性标语横幅，扰乱活动秩序。</p><p>通报称，公安机关依法传唤违法行为人并收集固定相关证据。依据相关法律规定，对两名违法行为人处以行政拘留五日；对其余涉案人员分别处以警告、罚款处罚。</p><p>通报指，上述人员的行为严重违背体育精神，损害联赛形象，组委会坚决反对并予以谴责。组委会呼吁大家文明理性观赛，共同维护良好赛场秩序。</p><p>据网传视频，有场外观众拉横幅“衡阳衡阳，出门遛狗请牵绳”，被批评引发地域矛盾。</p>"
-  },
   "https://www.zaobao.com.sg/news/china/story20261116-10008321": {
     "fetchedAt": "2026-11-16T20:29:48.600Z",
     "v": 31,
@@ -195,5 +59,142 @@
       "datetime": "2026-11-16 18:37"
     },
     "contentHtml": "<p><img src=\"https://cassette.sphdigital.com.sg/image/zaobao/929d5c39755f7309f124c7c7260a22a988bd6e2cd51b68c7542ab0db66c1d2dc?f=webp&amp;o=zbimg&amp;oloc=se\" alt=\"中国中小学校、幼儿园将聘任健康副校（园）长，由医疗卫生机构等派出，每学期到校现场指导不少于四次。图为10月30日，常德外国语学校的学生在食堂吃午餐。\"/></p><p>中国中小学校、幼儿园将聘任健康副校（园）长，由医疗卫生机构等派出，每学期到校现场指导不少于四次。图为10月30日，常德外国语学校的学生在食堂吃午餐。</p><p>央视新闻报道，为推动儿童青少年健康管理服务关口前移，中国国家卫生健康委联合教育部、国家中医药局、国家疾控局星期一（11月16日）印发关于聘任健康副校（园）长的通知。</p><p>通知指出，健康副校（园）长是由卫生健康行政部门（含中医药、疾控主管部门）、教育行政部门组织指导；教育和卫生健康行政部门按照就近就便、能力适配、统筹均衡要求，共同制定健康副校（园）长选聘工作计划并确定人选。</p><p>对于人选条件，通知要求医疗卫生机构选派中级及以上技术职称的专业人员承担健康副校（园）长具体工作。</p><p>工作内容包括协助推进健康学校建设、指导儿童青少年健康管理、开展健康教育与科普宣传、助力提升教职人员业务能力等。</p><p>通知规定，健康副校（园）长每学期到校现场指导不少于四次、组织健康科普宣讲不少于两次，每学期到校参加一次专题会议，参与学校健康管理决策。</p><p>在医校协同方面，健康副校（园）长推动学校和医疗卫生机构协同加强学生健康服务，完善学生健康问题全链条管理；在团队支撑方面，明确实施“1+N”协作模式，即一名健康副校（园）长在校园一线兼职工作，医疗卫生机构加强儿科、营养、心理、中医、公共卫生等多学科支撑；在培训方面，要求任职前接受不少于八学时的系统培训；在激励方面，建立考核评价制度，对表现突出者予以表扬。</p><p>通知要求各地须结合实际细化工作要求，完善工作措施，统筹推进健康副校（园）长选聘、培训、履职管理、考核评价等工作，持续推动制度落地见效。</p><p>去年12月，国家卫生健康委等10部门联合印发《儿童青少年“五健”促进行动计划（2026—2030年）》，促进儿童青少年体重、视力、心理、骨骼和口腔健康，并将健康副校（园）长制度作为一项重要举措。</p>"
+  },
+  "https://www.zaobao.com.sg/news/china/story20261117-10010680": {
+    "fetchedAt": "2026-11-17T03:55:23.141Z",
+    "v": 31,
+    "meta": {
+      "datetime": "2026-11-17 11:53"
+    },
+    "contentHtml": "<p>路透社星期二报道这则消息。卡尼与习近平在亚太经合组织（APEC）领导人会议召开前夕举行会晤。</p><p>据路透社报道，卡尼今年1月访问中国，成为近10年来首位访华的加拿大总理。此次访问是他推动加拿大减少对美国经济高度依赖的重要战略举措之一。</p><p>星期二在深圳举行的会晤，是卡尼出任总理以来第三次与习近平会面。两人此前曾在去年于韩国举行的APEC会议期间会晤。</p>"
+  },
+  "https://www.zaobao.com.sg/news/china/story20261117-10010637": {
+    "fetchedAt": "2026-11-17T03:55:23.725Z",
+    "v": 31,
+    "meta": {
+      "datetime": "2026-11-17 11:50"
+    },
+    "contentHtml": "<p><img src=\"https://cassette.sphdigital.com.sg/image/zaobao/d5775e16fbf61eb5dae3aa1c16c1cfc4da0d78136972607999f7d5d25771dcac?f=webp&amp;o=zbimg&amp;oloc=se\" alt=\"台湾总统赖清德（中）11月12日在台北总统府与台湾亚太经济合作组织（APEC）峰会领袖代表、宏碁集团创办人施振荣（左）及施振荣妻子叶紫华合影。 （路透社）\"/></p><p>台湾总统赖清德（中）11月12日在台北总统府与台湾亚太经济合作组织（APEC）峰会领袖代表、宏碁集团创办人施振荣（左）及施振荣妻子叶紫华合影。 （路透社）</p><p>《明报》星期二（11月17日）刊登的《中国透视》专栏指出，台湾总统赖清德邀请现年81岁的施振荣出任领袖代表，反映台方仍高度重视参与APEC。</p><p>文章指出，施振荣曾于2007年代表台湾出席澳大利亚悉尼APEC峰会，并长期参与半导体投资及台积电公司治理，在国际商界颇有声望。他熟悉国际商务交流与礼仪分寸，预计不会在深圳峰会期间采取引发政治争议的举动，也可能因此获得大陆方面礼遇。</p><p>文章也提到，台湾劳动部长洪申翰和财政部长庄翠云此前分别前往南京及香港，出席APEC相关部长级会议，均未发生争议，因此相信施振荣此行也将“无风无浪”。</p><p>台湾总统府11月11日宣布，由施振荣担任今年APEC领袖代表，并呼吁大陆方面履行主办责任及书面保证，确保台湾代表团在平等、尊严及安全的前提下参与各项会议。</p><p>赖清德隔天在代表团行前记者会上，期许施振荣向国际社会传达台湾三项主张，包括积极参与APEC事务、推动全球科技合作及强化人工智能（AI）供应链韧性，以及深化与区域伙伴的经贸合作。</p><p>台湾外交部星期一（11月16日）说，施振荣夫妇预计星期三率团前往深圳。</p><p>另一方面，《明报》指出，去年在韩国庆州举行的APEC峰会期间，台湾代表林信义曾与日本首相高市早苗会面，日方随后主动公布两人合照及相关消息，引发北京强烈抗议。文章认为，在当前中日关系紧张的背景下，施振荣“更加不可能”在深圳与高市早苗举行正式会面。</p><p>据日本共同社报道，施振荣上星期五（11月13日）向媒体透露，此次并未安排与高市早苗举行正式会谈，但相信仍有机会在会场交谈。</p>"
+  },
+  "https://www.zaobao.com.sg/news/china/story20261117-10010622": {
+    "fetchedAt": "2026-11-17T03:55:24.482Z",
+    "v": 31,
+    "meta": {
+      "datetime": "2026-11-17 11:44"
+    },
+    "contentHtml": "<p><img src=\"https://cassette.sphdigital.com.sg/image/zaobao/67d82f5086b1a613a0af7b21c5819848b6da478578c6b12ed371b21c41df9f58\" alt=\"中美俄元首周四会晤 中方促共同合作应对全球挑战\"/></p><p>中美俄元首周四会晤 中方促共同合作应对全球挑战</p><p>据俄罗斯国际文传电讯社，普京和习近平将于星期三在亚太经合组织（APEC）会议期间举行双边会谈，先进行扩大会谈，再以工作早餐形式举行小范围会谈，讨论广泛的双边及国际议题。</p><p>乌沙科夫星期一（11月16日）向记者说，双方代表团的首轮会谈将主要讨论双边经济合作的发展前景。</p><p>他说，自2010年以来，中国一直是俄罗斯最大的对外贸易伙伴，而俄罗斯则是中国第五大贸易伙伴国。</p><p>乌沙科夫称，2024年俄中双边贸易额创下2450亿美元（下同，3157.07亿新元）的纪录，目前预计今年将打破这一纪录。今年前三个季度，双边贸易额已达到2164亿美元。</p><p>谈及会谈将涉及的经济议题，乌沙科夫说：“自然包括能源、金融、高科技、人工智能等。”</p><p>除了俄中双边会谈，中国官方也确认，习近平、普京，以及美国总统特朗普将于星期四（11月19日）在深圳举行三方会晤。</p><p>中国外交部说，这是史上中美俄三国元首第一次面对面会晤，具有开创性意义，三国肩负着合作应对全球挑战、促进世界和平稳定的重要责任。</p>"
+  },
+  "https://www.zaobao.com.sg/news/china/story20261117-10010343": {
+    "fetchedAt": "2026-11-17T03:55:25.226Z",
+    "v": 31,
+    "meta": {
+      "datetime": "2026-11-17 11:05"
+    },
+    "contentHtml": "<p><img src=\"https://cassette.sphdigital.com.sg/image/zaobao/34a02785f7849e75c86d379d163f39713f72e8e690a112a20135ba11ed7e91d3\" alt=\"解放军报：下力解决坚持党对军队绝对领导等方面突出问题\"/></p><p>解放军报：下力解决坚持党对军队绝对领导等方面突出问题</p><p>张升民在题为《保持惩治腐败高压态势》的文章中指出，坚决防治腐败是中共必须长期抓好的重大政治任务，反腐败斗争绝对不能松、不能退、不能让，必须坚决同一切危害中共的肌体健康、侵蚀中共的执政根基的腐败现象作斗争，确保中共始终具有强大创造力凝聚力战斗力。</p><p>张升民称，坚持无禁区、全覆盖、零容忍，这是中共中央反腐败的鲜明态度和坚定立场，必须有腐必反、有贪必肃、除恶务尽。</p><p>他进一步写道，不管是谁、不管职务多高、不管贡献多大，只要搞腐败就决不姑息，决不允许有“铁帽子王”、“丹书铁券”。</p><p>张升民说，反腐败斗争不能有盲区，也不能有特区，哪里有死角就向哪里延伸拓展，哪里问题突出就在哪里揭盖深挖，让那些想搞腐败的人断了念头、搞了腐败的人付出代价。</p><p>谈及反腐败工作的重点任务，张升民提出，要重点查处政治问题和经济问题交织的腐败案件。严厉惩治政商勾连腐败，深挖以商养官、以官护商、官商一体，坚决打击以权力为依托的资本逐利行为，坚决防止各种利益集团、权势团体向政治领域渗透。</p><p>同时，严查重处跑官要官、买官卖官、拉票贿选等行为，严惩结交或充当政治掮客、政治骗子等行为，决不让投机钻营者得利。</p><p>张升民也提到，深化权力集中、资金密集、资源富集领域的腐败问题整治。他说，这些领域廉政风险大，仍是腐败重灾区，必须深挖彻查腐败问题，常打扫、清死角、深起底，坚决打破潜规则、斩断利益链，坚决清除系统性腐败风险隐患。</p><p>张升民称，要严肃查处“一把手”腐败案件，以及领导干部家族式腐败、身边人腐败，坚决防止利用手中权力谋私贪腐。他说，“一把手”违纪违法最易产生催化、连锁反应，甚至造成区域性、系统性、塌方式腐败，要推动发生重大腐败案件的地方、部门和单位彻底肃清流毒、修复政治生态。</p><p>张升民强调，人民军队不容腐败，要坚决扫除一切影响军队纯洁光荣的消极腐败现象，清除危害国防安全、国家安全的重大隐患。</p><p>他最后写道，要深化军地反腐败协作联动，完善信息互通、力量协同、联合惩戒等机制，不断提升防治腐败整体合力。紧盯重大装备研制、重大工程建设、军地交往活动等重点加强监督检查，打通军地交叉地带监管梗阻，全面提高跨军地治理水平。</p>"
+  },
+  "https://www.zaobao.com.sg/news/china/story20261117-10010274": {
+    "fetchedAt": "2026-11-17T03:55:25.974Z",
+    "v": 31,
+    "meta": {
+      "datetime": "2026-11-17 10:52"
+    },
+    "contentHtml": "<p><img src=\"https://cassette.sphdigital.com.sg/image/zaobao/6a16a53fee0c176d0beba0376f7617d1837cbbdc2cdac6141eab4b902816685f?f=webp&amp;o=zbimg&amp;oloc=se\" alt=\"台湾外交部次长陈明祺说，美国总额140亿美元的对台军售案何时获批，很大程度上取决于美国总统特朗普。图为陈明祺10月13日在台北接受记者联访。 （路透社）\"/></p><p>台湾外交部次长陈明祺说，美国总额140亿美元的对台军售案何时获批，很大程度上取决于美国总统特朗普。图为陈明祺10月13日在台北接受记者联访。 （路透社）</p><p>陈明祺在法新社星期二（11月17日）刊登的专访中说，台湾长期获得美国国会两党“强有力的支持”，因此即使民主党在本月期中选举中赢得参众两院控制权，也不会影响军售案的批准时间。 </p><p>他说：“至于批准时间，我认为这很大程度上取决于特朗普总统。” </p><p>陈明祺指出，特朗普政府在考虑对台军售时，须权衡包括中东战争在内的多项因素。台湾尊重美方的考量，但也已表明迫切需要相关军事装备，以强化自身防卫能力。</p><p>台湾已等待数月，希望特朗普批准这项总额140亿美元的军售案，内容包括爱国者导弹、自动化指挥与控制系统，以及360度全方位防空雷达系统等装备。</p><p>特朗普今年5月与中国国家主席习近平会晤后，曾说暂时搁置这项军售案，并形容它是与北京谈判的筹码。</p><p>陈明祺强调，台湾与特朗普政府保持良好的直接沟通，相信这种沟通不会改变。他认为，军售案获批可能只是时间问题，无论最终以单一方案或分批方式批准。 </p><p>特朗普预计本星期在深圳举行的亚太经济合作组织（APEC）峰会期间，以及12月在美国举行的二十国集团（G20）峰会上，再度与习近平会面。</p><p>尽管台湾问题曾是两人此前会谈的议题之一，陈明祺对即将举行的会晤并不担忧，强调“我们对台湾与美国，以及其他理念相近伙伴的关系非常有信心，也感到十分安心”。 </p><p>他说：“台湾具有结构性的重要地位，我们的人民也致力于自身防卫。我认为，这才是最重要的。” </p><p>陈明祺也指出，台湾处于全球AI革命的核心，在先进半导体供应链中占据重要地位，相信如今几乎所有国家领导人都了解台湾的重要性。</p>"
+  },
+  "https://www.zaobao.com.sg/news/china/story20261117-10010179": {
+    "fetchedAt": "2026-11-17T03:55:26.726Z",
+    "v": 31,
+    "meta": {
+      "datetime": "2026-11-17 10:39"
+    },
+    "contentHtml": "<p><img src=\"https://cassette.sphdigital.com.sg/image/zaobao/4a96c3505194e8c667a1e60bce3b6934501c252bc4646e990af09d3b55a0ae72\" alt=\"加国部长：加拿大将寻求务实强化与中国经贸往来\"/></p><p>加国部长：加拿大将寻求务实强化与中国经贸往来</p><p>据央视新闻客户端消息，习近平星期二上午在深圳会见赴华出席亚太经合组织（APEC）领导人非正式会议的卡尼。</p><p>据路透社报道，卡尼今年1月访问中国，成为近10年来首位访华的加拿大总理。此次访问是他推动加拿大减少对美国经济高度依赖的重要战略举措之一。</p><p>星期二在深圳举行的会晤，是卡尼出任总理以来第三次与习近平会面。两人此前曾在去年于韩国举行的APEC会议期间会晤。</p>"
+  },
+  "https://www.zaobao.com.sg/news/china/story20261117-10010049": {
+    "fetchedAt": "2026-11-17T03:55:27.474Z",
+    "v": 31,
+    "meta": {
+      "datetime": "2026-11-17 10:21"
+    },
+    "contentHtml": "<p><img src=\"https://cassette.sphdigital.com.sg/image/zaobao/0b8145aada6df15f1da165d051125ef49f47435e01306e3a3967257712555085?f=webp&amp;o=zbimg&amp;oloc=se\" alt=\"中国一汽旗下红旗品牌成为本届APEC会议的官方合作伙伴及指定用车品牌，近700辆红旗高端车型将承担会议礼宾接待任务。 （“一汽红旗”微博）\"/></p><p>中国一汽旗下红旗品牌成为本届APEC会议的官方合作伙伴及指定用车品牌，近700辆红旗高端车型将承担会议礼宾接待任务。 （“一汽红旗”微博）</p><p>综合香港《星岛日报》、中国《经济观察报》和观察者网报道，中国一汽红旗和比亚迪均成为本届APEC会议的官方合作伙伴，腾势则是官方指定用车品牌之一。红旗和腾势分别宣布投入近700辆汽车，为与会代表团及媒体提供出行服务。</p><p>其中，中国一汽10月21日宣布，将投入近700辆红旗高端车型，为各经济体代表团成员、外交和贸易双部长会代表，以及高官会代表提供接待服务。车型包括全新红旗H9、新红旗HQ9和红旗金葵花国悦等。这批车辆已于10月23日在深圳正式移交会议筹委会。</p><p>腾势则于10月22日在深圳举行首批指定用车发车仪式，宣布计划投入近700辆汽车，其中腾势D9超过600辆，成为接待车队的主力车型。相关车辆将为来自21个APEC经济体的代表团及海内外媒体提供出行服务。</p><p>两家车企公布的车辆数量均接近700辆，但会议筹办方尚未公布接待车队的统一总规模，因此目前无法确认两家品牌合计投入的实际车辆数量。</p><p>这并非红旗首次参与APEC会议接待工作。2014年北京APEC会议期间，红旗L5曾作为各国领导人专用车，红旗H7则负责接待部长级以上官员。时隔12年，红旗再次参与中国主办的APEC会议，并首次将新能源车型纳入相关礼宾车队。</p><p>腾势近年来也积极参与大型国际会议的车辆接待工作。据公司介绍，旗下D9车型今年先后服务博鳌亚洲论坛、中国—亚细安博览会及夏季达沃斯论坛等活动。</p><p>星岛网指出，过去大型国际会议的高规格接待用车多采用奔驰、宝马和奥迪等欧洲品牌。此次深圳APEC会议采用红旗和腾势等国产高端车型，也反映中国汽车品牌正逐渐扩大在国际会议礼宾接待领域的参与程度。</p><p>本届APEC领导人非正式会议定于11月18日至19日在深圳举行，是中国继2001年上海和2014年北京后，第三次主办APEC领导人会议。</p>"
+  },
+  "https://www.zaobao.com.sg/news/china/story20261117-10009931": {
+    "fetchedAt": "2026-11-17T03:55:28.045Z",
+    "v": 31,
+    "meta": {
+      "datetime": "2026-11-17 09:58"
+    },
+    "contentHtml": "<p><img src=\"https://cassette.sphdigital.com.sg/image/zaobao/3052c2516d1d91784634e2928579c07a4aa9e7496c8158529046742c2aabe7cf?f=webp&amp;o=zbimg&amp;oloc=se\" alt=\"11月16日，在菲律宾马尼拉举行的第49届亚细安峰会期间，出席亚细安—中国峰会的各国领导人及代表手拉手合影。左起为缅甸代表埃埃丁、马来西亚首相安华、泰国首相阿努廷、东帝汶总理夏纳纳、越南总理黎明兴、中国总理李强、菲律宾总统小马可斯、新加坡总理黄循财、文莱苏丹哈桑纳尔、印尼总统普拉博沃、柬埔寨副首相洪尊那隆，以及老挝总理沙伦赛。 （路透社）\"/></p><p>11月16日，在菲律宾马尼拉举行的第49届亚细安峰会期间，出席亚细安—中国峰会的各国领导人及代表手拉手合影。左起为缅甸代表埃埃丁、马来西亚首相安华、泰国首相阿努廷、东帝汶总理夏纳纳、越南总理黎明兴、中国总理李强、菲律宾总统小马可斯、新加坡总理黄循财、文莱苏丹哈桑纳尔、印尼总统普拉博沃、柬埔寨副首相洪尊那隆，以及老挝总理沙伦赛。 （路透社）</p><p>综合菲律宾《每日问询者报》《马尼拉时报》报道，拉萨罗星期一（11月16日）在新闻发布会上说，中国总理李强当天在亚细安—中国峰会上重申支持尽早达成《南中国海行为准则》，与北京过去作出的承诺一致。</p><p>她指出，中国与亚细安一直致力于完成行为准则谈判，如果北京改变立场，将在亚细安内部引起争议。</p><p>拉萨罗说，虽然行为准则无法在菲律宾担任亚细安轮值主席国期间完成，但马尼拉并不感到失望。在菲律宾今年推动的多轮谈判下，双方已达成初步共识的草案条文比例，从约50%提高至约80%。</p><p>她说：“我们为什么要感到失望？我们只是需要更多时间，但我们必须停下来，把工作交给下一个轮值主席国。” </p><p>拉萨罗指出，尽管菲律宾推动双方每个月举行谈判，仍没有足够时间完成协议。她认为，如果再多五六个月，谈判或许就能完成，但目前无法提供确切时间表，希望新加坡明年能够推动谈判取得进一步进展。</p><p>亚细安与中国2023年同意加快谈判，争取在2026年完成《南中国海行为准则》，以制定管理海上争端、防止冲突升级的规则。菲律宾总统小马可斯此前也将完成谈判，列为菲国担任亚细安轮值主席国的主要目标之一。</p><p>不过，尽管谈判已进入最后阶段，各方在行为准则是否具有法律约束力等关键问题上，仍存在分歧。</p><p>中国与亚细安2002年签署《南中国海各方行为宣言》，并于2017年正式启动行为准则谈判。近年来，中国与菲律宾因南中国海主权和海洋权益争议屡次发生海上对峙，也凸显建立有效危机管控机制的迫切性。</p>"
+  },
+  "https://www.zaobao.com.sg/news/china/story20261117-10009947": {
+    "fetchedAt": "2026-11-17T03:55:28.794Z",
+    "v": 31,
+    "meta": {
+      "datetime": "2026-11-17 09:55"
+    },
+    "contentHtml": "<p><img src=\"https://cassette.sphdigital.com.sg/image/zaobao/4a96c3505194e8c667a1e60bce3b6934501c252bc4646e990af09d3b55a0ae72\" alt=\"加国部长：加拿大将寻求务实强化与中国经贸往来\"/></p><p>加国部长：加拿大将寻求务实强化与中国经贸往来</p><p>据路透社报道，卡尼今年1月访问中国，成为近10年来首位访华的加拿大总理。此次访问是他推动加拿大减少对美国经济高度依赖的重要战略举措之一。</p><p>星期二在深圳举行的会晤，将是卡尼出任总理以来第三次与习近平会面。两人此前曾在去年于韩国举行的APEC会议期间会晤。</p><p>卡尼星期天（11月15日）说，与习近平会晤时，也将讨论中国在国际体系中角色的变化。</p><p>卡尼说：“这是我上任以来推动加中经济关系正常化进程的一部分。”他这番话也间接提及加拿大前总理特鲁多执政期间，两国关系一度紧张。 </p><p>另据法新社报道，卡尼星期一（16日）说，如果美国总统特朗普加征关税，导致北美汽车产业的一体化格局进一步受到削弱，加拿大汽车制造商可能转向中国。</p><p>特朗普去年对加拿大汽车业加征惩罚性关税，并多次表示他希望所有在美国销售的汽车，都只由美国工人制造。</p><p>卡尼今年8月退出与特朗普的贸易谈判，但近几个星期以来，加拿大和美国都对达成协议的前景表示乐观。</p><p>卡尼说，考虑转向中国“不是为了增加谈判筹码，而是采取行动、作出回应”。 </p><p>批评人士警告，加拿大与中国关系日益密切，可能危及加拿大的国家安全。北京此前监禁了香港传媒大亨黎智英，去年还秘密处决了四名加拿大公民。加拿大也发现了中国干预至少两届联邦选举的证据。在此背景下，卡尼仍有意扩大与中国的经贸往来，引发人权团体批评。中国则表示，无意干涉加拿大内政。</p><p>路透社引述战略治国方略中心（Centre for Strategic Statecraft）智库联合创始人纳吉布拉说：“卡尼已经完成了稳定对华关系这项艰巨任务，但如今面临更大的挑战，就是如何在有选择地开展对华经济合作的同时，维护加拿大的经济和国家安全。” </p><p>纳吉布拉说：“加拿大需要明确如何处理这些敏感问题，目前还不清楚加方是否已向中方充分说明具体的应对方式。” </p><p>卡尼多次称，与中国接触并不意味着认同中国的立场。他也说，加拿大必须与那些希望推动其作出改变的国家保持往来。</p>"
+  },
+  "https://www.zaobao.com.sg/news/china/story20261117-10009793": {
+    "fetchedAt": "2026-11-17T03:55:29.536Z",
+    "v": 31,
+    "meta": {
+      "datetime": "2026-11-17 09:35"
+    },
+    "contentHtml": "<p><img src=\"https://cassette.sphdigital.com.sg/image/zaobao/3d1aaeb9ae8183d857148854c316d3ec76960dbf4e8b809cb26e8efd9af9f9d2?f=webp&amp;o=zbimg&amp;oloc=se\" alt=\"中国主要人工智能（AI）企业近期纷纷削弱旗下新模型的网络攻击能力，以降低技术被滥用的风险。这张示意图显示屏幕上显示“AI黑客”字样及PHP程序代码，图摄于10月22日。 （路透社档案照片）\"/></p><p>中国主要人工智能（AI）企业近期纷纷削弱旗下新模型的网络攻击能力，以降低技术被滥用的风险。这张示意图显示屏幕上显示“AI黑客”字样及PHP程序代码，图摄于10月22日。 （路透社档案照片）</p><p>据彭博社星期二（11月17日）报道，阿里巴巴、腾讯和月之暗面等中国AI企业近期推出的新模型，均削弱了网络攻击能力，同时强化网络防御功能。</p><p>其中，阿里巴巴发布最新一代旗舰通义千问模型时，未公开决定模型运作方式的内部参数，即模型权重（weights），使用户无法下载和自行调整完整模型。</p><p>开放权重模型尤其受到黑客青睐，因为用户可在本地运行模型，并自行调整参数。深度求索（DeepSeek）的模型就曾被用于网络攻击，而阿里巴巴的通义千问系列，也是全球下载量最高的开放权重模型系列之一。</p><p>腾讯本月初发布Hy4模型前，也削弱了部分网络攻击功能；月之暗面推出Kimi K3.1 Pro模型时，采取了类似措施。智谱AI则在今年8月开放GLM-5.3模型权重前，进行安全审查，并向相关机构通报发现的系统漏洞。</p><p>这些调整正值中国政府加强AI安全监管之际。中国商务部和科技部上个月公布出口管制草案，拟禁止出口AI驱动的恶意代码生成与变异技术，并限制AI辅助漏洞挖掘等技术出口。部分达到“全球领先水平”的大型语言模型，也可能面临海外部署限制。</p><p>中国国家发展和改革委员会本月初也说，正加快制定AI安全标准和伦理规范，推动企业在模型开发过程中纳入安全防护措施。</p><p>网络安全公司CrowdStrike上个月指出，黑客曾利用DeepSeek模型，对14个国家的机构发动网络攻击。月之暗面的Kimi K3模型此前也曾在独立研究机构的测试中，突破英国政府AI安全研究所开发的隔离测试环境。</p><p>曾任职于美国OpenAI的腾讯首席AI科学家姚顺雨，本月在香港一场活动上警告，AI模型的网络攻击能力，以及未来在生物领域的能力，将逐渐达到可能造成实际危害的临界点。 </p><p>追踪亚太地区网络活动的网络安全机构TeamT5首席分析师Charles Li认为，中国正试图在AI技术的国际商业化和战略管控之间取得平衡。 </p><p>他指出：“随着中国前沿AI模型据报在网络安全能力方面逐渐缩小与美国同类模型的差距，北京越来越将这些能力视为战略资产，并认为有必要实施更严格的出口管制。” </p>"
+  },
+  "https://www.zaobao.com.sg/news/china/story20261117-10009750": {
+    "fetchedAt": "2026-11-17T03:55:30.282Z",
+    "v": 31,
+    "meta": {
+      "datetime": "2026-11-17 09:25"
+    },
+    "contentHtml": "<p>设为谷歌新闻首选来源<h1>360市场负责人据报被带走调查 本人否认</h1><p>中国网络安全公司360集团副总裁、市场部负责人卜思南据报上周被警方带走调查，但他本人否认有关传闻，称消息“不是真的”。</p><p>第一财经星期一（11月16日）晚引述消息人士报道，卜思南上周被警方带走调查。不过，据快科技报道，卜思南当晚通过微信向媒体否认有关传闻，称“不是真的”，目前“在处理ing”。</p><p>当被问及是否由本人使用微信回复时，卜思南也明确回复是本人。截至发稿，360集团尚未回应有关消息。</p><p>“鞭牛士”微信公众号星期一晚也引述消息人士称，卜思南因涉嫌职务侵占等案件，已在上周一（9日）被警方带走。消息人士透露，除了卜思南涉案外，360集团内部或许还有相关人员被带走调查。</p><p>今年8月，360集团宣布，为推进“安全+AI”战略，对集团市场与传播中心进行组织调整，设立公关部和市场部，任命卜思南为市场部负责人，向集团CEO周鸿祎汇报。</p>"
+  },
+  "https://www.zaobao.com.sg/news/china/story20261117-10009638": {
+    "fetchedAt": "2026-11-17T03:55:31.034Z",
+    "v": 31,
+    "meta": {
+      "datetime": "2026-11-17 08:59"
+    },
+    "contentHtml": "<p><img src=\"https://cassette.sphdigital.com.sg/image/zaobao/013648ec6c6b2356976f7e02ed5108b202e6022e29a52723bb43866c2f928ce9?f=webp&amp;o=zbimg&amp;oloc=se\" alt=\"中国广东省深圳市即将在本周主办亚太经济合作组织（APEC）峰会。图为深圳市民众星期一（11月16日）聚集观看建筑物外墙上演的灯光秀。 （法新社）\"/></p><p>中国广东省深圳市即将在本周主办亚太经济合作组织（APEC）峰会。图为深圳市民众星期一（11月16日）聚集观看建筑物外墙上演的灯光秀。 （法新社）</p><p>综合彭博社和路透社报道，宁德时代创办人兼董事长曾毓群、百度董事长兼首席执行官李彦宏，以及宇树科技创办人王兴兴，将在峰会上发表演讲。</p><p>其他参会的中国企业高管，包括比亚迪董事长王传福、小米集团首席执行官雷军、中国农业银行董事长谷澍、中国工商银行董事长廖林，以及中国银行董事长葛海蛟。</p><p>国际企业代表则包括波音全球总裁纳尔逊（Brendan Nelson）、维萨（Visa）首席执行官麦凯恩（Ryan McInerney）、万事达卡首席执行官米巴赫（Michael Miebach）、联合包裹服务公司（UPS）首席执行官托梅（Carol Tomé），以及谷歌全球政府事务与公共政策主管巴蒂亚（Karan Bhatia）。</p><p>据中国官媒新华社报道，峰会预计吸引超过2000名政商界领袖出席，其中包括115家世界500强企业的代表。美国参会企业数量居境外经济体之首、占比近20%。</p><p>值得注意的是，宁德时代、百度和宇树科技均被美国国防部列入“中国军事企业清单”，引发北京不满。美国今年7月也以潜在供应链风险为由，收紧对部分外国制造机器人的限制，可能影响宇树科技等企业。</p><p>在中美科技竞争持续、美国加强对部分中国科技企业限制的背景下，此次峰会也为两国商界领袖提供面对面交流、寻求合作的机会。</p><p>本届APEC工商领导人峰会以“共促繁荣、共赢未来”为主题，定于11月17日至18日在深圳前海国际会议中心举行。与会代表将围绕人工智能、数字经济、区域互联互通、亚太自贸区建设等议题展开讨论。</p><p>除了中国国家主席习近平，澳大利亚、加拿大、韩国、马来西亚、俄罗斯等11个APEC经济体的领导人也将出席峰会，并发表演讲或参与专题讨论。</p><p>工商领导人峰会与11月18日至19日举行的APEC经济领袖会议部分重叠。习近平、美国总统特朗普和俄罗斯总统普京预计星期四（19日）在深圳举行三方会晤，这将是三国元首首次面对面会谈。</p><p>中国外交部星期一形容，这场会晤具有“开创性意义”，有助于促进世界和平与稳定。白宫此前则透露，特朗普将在会谈中提出核裁军问题。</p>"
+  },
+  "https://www.zaobao.com.sg/news/china/story20261117-10009593": {
+    "fetchedAt": "2026-11-17T03:55:31.605Z",
+    "v": 31,
+    "meta": {
+      "datetime": "2026-11-17 08:45"
+    },
+    "contentHtml": "<p><img src=\"https://cassette.sphdigital.com.sg/image/zaobao/a8b950a9b148cf25d39a7d1a56486bc09683d9fe960f6dd786a9bc1872acc36f?f=webp&amp;o=zbimg&amp;oloc=se\" alt=\"位于深圳南山区的麒麟山庄，是深圳市官方重要接待基地，占地38公顷。中美俄元首将于星期四（11月19日）下午在麒麟山庄举行会晤。 （互联网）\"/></p><p>位于深圳南山区的麒麟山庄，是深圳市官方重要接待基地，占地38公顷。中美俄元首将于星期四（11月19日）下午在麒麟山庄举行会晤。 （互联网）</p><p>据《明报》星期二（11月17日）报道，位于深圳南山区的麒麟山庄，星期一进入山庄的道路口已经有数名警员看守，不让人随意进入或拍照。</p><p>报道称，麒麟山庄是深圳市官方重要接待基地，主要承担领导人访问深圳时的接待任务。山庄坐落深圳西北麒麟山麓，毗邻西丽湖，占地38公顷，旁边是西丽高尔夫球场和深圳野生动物园。山庄内有多栋别墅和大型宴会厅，采用欧陆建筑风格。</p><p>另据网媒“香港01”报道，麒麟山庄距离深圳宝安国际机场约半小时车程。</p><p>白宫随行记者团星期一（16日）在社交平台X披露的特朗普访华行程显示，中美俄元首星期四下午的会晤将在麒麟山庄举行。</p><p>根据行程，特朗普将在星期三（18日）下午离开菲律宾马尼拉，前往深圳。他星期四先在深圳国际交流中心出席亚太经济合作组织（APEC）领导人全体会议，随后前往麒麟山庄，与中国国家主席习近平举行双边会晤，之后再参与中美俄元首会晤。</p>"
+  },
+  "https://www.zaobao.com.sg/news/china/story20261117-10009532": {
+    "fetchedAt": "2026-11-17T03:55:32.405Z",
+    "v": 31,
+    "meta": {
+      "datetime": "2026-11-17 08:30"
+    },
+    "contentHtml": "<p><img src=\"https://cassette.sphdigital.com.sg/image/zaobao/18dd4eada737a007fc1705af0b8f1a4930a159decfac10a45723db57e18a8d73?f=webp&amp;o=zbimg&amp;oloc=se\" alt=\"美国特朗普政府宣布收紧先进人工智能（AI）晶片出口管制，防止中国企业通过海外数据中心，绕过美国对华晶片出口限制。 （路透社档案照片）\"/></p><p>美国特朗普政府宣布收紧先进人工智能（AI）晶片出口管制，防止中国企业通过海外数据中心，绕过美国对华晶片出口限制。 （路透社档案照片）</p><p>综合彭博社和路透社报道，美国商务部星期一（11月16日）公布新规定，限制英伟达等美国企业生产的先进AI晶片出口至上述五国的数据中心。中国企业此前一直通过这些数据中心远程获取算力，以训练AI模型。</p><p>根据新规定，向总部设在中国的企业提供大量运算能力的海外数据中心，须在90天内取得美国出口许可证，才能继续提供相关服务，否则将面临进一步的出口限制。许可证申请将逐案审查。</p><p>不过，新规定允许总部设在美国的企业，在符合特定申报要求的情况下，继续向上述五国进口相关晶片，而无须申请许可证。专门用于网络零售商和社交媒体商业推荐系统的算力服务，也可豁免相关限制。</p><p>美国商务部在声明中指出，新措施旨在确保现有针对美国敏感技术的限制，不会被涉及第三国数据中心的远程运算安排所规避。 </p><p>东南亚近年来逐渐崛起为数据中心枢纽，阿里巴巴和字节跳动等中国科技企业对AI运算能力的需求，推动当地相关基础设施迅速扩张，其中马来西亚和泰国成为主要投资热点。</p><p>新规出台之际，英伟达正卷入涉嫌违反出口管制的丑闻。公司前首席执行官黄仁勋上星期因承认与新加坡云端运算公司超速国际（Megaspeed International）一名前高管有婚外情而辞职。</p><p>超速国际是英伟达的合作伙伴，目前因涉嫌非法将先进AI晶片转运至中国而受到美国调查。公司否认有任何不当行为，强调始终遵守包括美国出口管制在内的适用法律。</p><p>这起事件也使美国商务部长卢特尼克面临更大压力。财长贝森特近日批评商务部未充分落实出口管制，并透露此前已有四个政府机构支持将超速国际列入贸易黑名单，但负责此事的商务部迟迟没有采取行动。</p><p>美国商务部在公布新规定时特别指出，规定“由财政部和国家安全委员会撰写，并根据两者的指示制定”，显示其他政府部门可能在推动新规出台方面发挥重要作用。 </p><p>前商务部高级官员尼卡赫塔尔（Nazak Nikakhtar）认为，新规定“早就应该出台，但执法责任归属仍是最突出的问题。如果商务部试图与新规保持距离，美国政府究竟会由哪个部门主导执法？” </p><p>尽管如此，特朗普星期一启程访问亚洲前仍公开表示信任卢特尼克，无意撤换他。特朗普指出，卢特尼克可能为了避免在敏感的美中贸易谈判期间激怒北京，而放缓出口管制工作。</p><p>新措施公布之际，特朗普正准备于星期四（11月19日）在深圳举行的亚太经济合作组织（APEC）峰会期间，与中国国家主席习近平会面。美国进一步收紧先进科技出口限制，可能为双方会谈增添变数。</p><p>前商务部官员科伦（Kate Koren）认为，新规对中国的影响，远大于仅将一家企业列入美国贸易黑名单。她指出，英伟达及黄仁勋此前一直主张向中国出售晶片，但近期丑闻使有关论点受到质疑，美国政策正朝收紧出口管制的方向转变。 </p><p>新规定也正式废除拜登政府时期制定、对全球先进AI晶片出口实施许可证限制的规定。新措施预计于星期四在美国《联邦公报》正式刊登后生效。</p>"
+  },
+  "https://www.zaobao.com.sg/news/china/story20261117-10009502": {
+    "fetchedAt": "2026-11-17T03:55:33.147Z",
+    "v": 31,
+    "meta": {
+      "datetime": "2026-11-17 08:20"
+    },
+    "contentHtml": "<p><img src=\"https://cassette.sphdigital.com.sg/image/zaobao/7ffc328cf67475b43917d7f3a2732cdcc8e402ea2ca7de8eeab98869173f749d?f=webp&amp;o=zbimg&amp;oloc=se\" alt=\"中国国家主席习近平星期一（11月16日）到广东省中山市考察。图为习近平在湾区未来科技城考察。 （新华社）\"/></p><p>中国国家主席习近平星期一（11月16日）到广东省中山市考察。图为习近平在湾区未来科技城考察。 （新华社）</p><p>据新华社报道，习近平星期一上午在中共广东省委书记黄坤明和省长孟凡利陪同下，到中山市考察调研。中央办公厅主任蔡奇、中国副总理何立峰等人也陪同考察。</p><p>习近平首先到深中通道西人工岛，了解通道建设运营情况。他说，建设粤港澳大湾区，首先要推进交通一体化。深中通道在促进珠江口东西两岸融合发展中发挥了开路先锋作用，要进一步把这一超大型交通工程管理好、运营好，使其更好服务粤港澳大湾区建设。</p><p>随后，习近平前往位于中山市翠亨新区的湾区未来科技城，察看中山市生物医药、电子信息、高端装备等现代产业发展成果，以及家具等传统产业产品展示，了解当地承接产业转移、推动传统产业转型升级、发展新兴产业等情况。</p><p>习近平称，建设粤港澳大湾区是中共中央作出的重大战略部署，广东肩负着重要使命，珠江口两岸的广州、深圳、珠海、东莞、中山等地要发挥先导作用。他希望中山市紧紧抓住机遇，下大气力推动科技创新和产业创新深度融合。</p><p>习近平也对现场的中小企业负责人和科技人员代表说，身处这个好时代，在这片创新创业的沃土上工作和生活，要倍加珍惜、锐意进取，努力为广东的发展、为粤港澳大湾区建设、为实现高水平科技自立自强多作贡献。</p><p>中国官方上周在北京举办了孙中山诞辰160周年纪念大会。习近平星期一也前往孙中山故居纪念馆，向孙中山铜像敬献花篮，并参观相关展览。</p><p>习近平说，孙中山为民族独立、社会进步、人民幸福建立了不朽功勋，是一代伟人。新征程上，要学习、继承、发扬他的宝贵精神，激励海内外全体中华儿女为以中国式现代化全面推进强国建设、民族复兴伟业而团结奋斗。</p><p>为期两天的APEC领导人非正式会议星期三（18日）起在深圳举行。中国官方确认，中美俄三国元首将于来临星期四（19日）在深圳会晤。中国外交部说，这是史上中美俄三国元首第一次面对面会晤，具有开创性意义，三国肩负着合作应对全球挑战、促进世界和平稳定的重要责任。</p>"
+  },
+  "https://www.zaobao.com.sg/news/china/story20261117-10009319": {
+    "fetchedAt": "2026-11-17T03:55:33.890Z",
+    "v": 31,
+    "meta": {
+      "datetime": "2026-11-17 07:31"
+    },
+    "contentHtml": "<p><img src=\"https://cassette.sphdigital.com.sg/image/zaobao/97cfd833cd88350d653e7d13c691c97ff7eeeeb9c2e6e20ab4461b69764e75e6?f=webp&amp;o=zbimg&amp;oloc=se\" alt=\"吴政隆（中）11月14日在大庆石化公司超细旦腈纶特种长丝项目现场调研。 （新华社）\"/></p><p>吴政隆（中）11月14日在大庆石化公司超细旦腈纶特种长丝项目现场调研。 （新华社）</p><p>设为谷歌新闻首选来源<h1>吴政隆：加快清理拖欠企业账款</h1><img src=\"https://cassette.sphdigital.com.sg/image/zaobao/97cfd833cd88350d653e7d13c691c97ff7eeeeb9c2e6e20ab4461b69764e75e6?f=webp&amp;o=zbimg&amp;oloc=se\" alt=\"吴政隆（中）11月14日在大庆石化公司超细旦腈纶特种长丝项目现场调研。 （新华社）\"/>吴政隆（中）11月14日在大庆石化公司超细旦腈纶特种长丝项目现场调研。 （新华社）<img src=\"data:image/webp;base64,UklGRhAOAABXRUJQVlA4WAoAAAAwAAAAYwAAaAAASUNDUEgMAAAAAAxITGlubwIQAABtbnRyUkdCIFhZWiAHzgACAAkABgAxAABhY3NwTVNGVAAAAABJRUMgc1JHQgAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLUhQICAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABFjcHJ0AAABUAAAADNkZXNjAAABhAAAAGx3dHB0AAAB8AAAABRia3B0AAACBAAAABRyWFlaAAACGAAAABRnWFlaAAACLAAAABRiWFlaAAACQAAAABRkbW5kAAACVAAAAHBkbWRkAAACxAAAAIh2dWVkAAADTAAAAIZ2aWV3AAAD1AAAACRsdW1pAAAD+AAAABRtZWFzAAAEDAAAACR0ZWNoAAAEMAAAAAxyVFJDAAAEPAAACAxnVFJDAAAEPAAACAxiVFJDAAAEPAAACAx0ZXh0AAAAAENvcHlyaWdodCAoYykgMTk5OCBIZXdsZXR0LVBhY2thcmQgQ29tcGFueQAAZGVzYwAAAAAAAAASc1JHQiBJRUM2MTk2Ni0yLjEAAAAAAAAAAAAAABJzUkdCIElFQzYxOTY2LTIuMQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWFlaIAAAAAAAAPNRAAEAAAABFsxYWVogAAAAAAAAAAAAAAAAAAAAAFhZWiAAAAAAAABvogAAOPUAAAOQWFlaIAAAAAAAAGKZAAC3hQAAGNpYWVogAAAAAAAAJKAAAA+EAAC2z2Rlc2MAAAAAAAAAFklFQyBodHRwOi8vd3d3LmllYy5jaAAAAAAAAAAAAAAAFklFQyBodHRwOi8vd3d3LmllYy5jaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABkZXNjAAAAAAAAAC5JRUMgNjE5NjYtMi4xIERlZmF1bHQgUkdCIGNvbG91ciBzcGFjZSAtIHNSR0IAAAAAAAAAAAAAAC5JRUMgNjE5NjYtMi4xIERlZmF1bHQgUkdCIGNvbG91ciBzcGFjZSAtIHNSR0IAAAAAAAAAAAAAAAAAAAAAAAAAAAAAZGVzYwAAAAAAAAAsUmVmZXJlbmNlIFZpZXdpbmcgQ29uZGl0aW9uIGluIElFQzYxOTY2LTIuMQAAAAAAAAAAAAAALFJlZmVyZW5jZSBWaWV3aW5nIENvbmRpdGlvbiBpbiBJRUM2MTk2Ni0yLjEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHZpZXcAAAAAABOk/gAUXy4AEM8UAAPtzAAEEwsAA1yeAAAAAVhZWiAAAAAAAEwJVgBQAAAAVx/nbWVhcwAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAo8AAAACc2lnIAAAAABDUlQgY3VydgAAAAAAAAQAAAAABQAKAA8AFAAZAB4AIwAoAC0AMgA3ADsAQABFAEoATwBUAFkAXgBjAGgAbQByAHcAfACBAIYAiwCQAJUAmgCfAKQAqQCuALIAtwC8AMEAxgDLANAA1QDbAOAA5QDrAPAA9gD7AQEBBwENARMBGQEfASUBKwEyATgBPgFFAUwBUgFZAWABZwFuAXUBfAGDAYsBkgGaAaEBqQGxAbkBwQHJAdEB2QHhAekB8gH6AgMCDAIUAh0CJgIvAjgCQQJLAlQCXQJnAnECegKEAo4CmAKiAqwCtgLBAssC1QLgAusC9QMAAwsDFgMhAy0DOANDA08DWgNmA3IDfgOKA5YDogOuA7oDxwPTA+AD7AP5BAYEEwQgBC0EOwRIBFUEYwRxBH4EjASaBKgEtgTEBNME4QTwBP4FDQUcBSsFOgVJBVgFZwV3BYYFlgWmBbUFxQXVBeUF9gYGBhYGJwY3BkgGWQZqBnsGjAadBq8GwAbRBuMG9QcHBxkHKwc9B08HYQd0B4YHmQesB78H0gflB/gICwgfCDIIRghaCG4IggiWCKoIvgjSCOcI+wkQCSUJOglPCWQJeQmPCaQJugnPCeUJ+woRCicKPQpUCmoKgQqYCq4KxQrcCvMLCwsiCzkLUQtpC4ALmAuwC8gL4Qv5DBIMKgxDDFwMdQyODKcMwAzZDPMNDQ0mDUANWg10DY4NqQ3DDd4N+A4TDi4OSQ5kDn8Omw62DtIO7g8JDyUPQQ9eD3oPlg+zD88P7BAJECYQQxBhEH4QmxC5ENcQ9RETETERTxFtEYwRqhHJEegSBxImEkUSZBKEEqMSwxLjEwMTIxNDE2MTgxOkE8UT5RQGFCcUSRRqFIsUrRTOFPAVEhU0FVYVeBWbFb0V4BYDFiYWSRZsFo8WshbWFvoXHRdBF2UXiReuF9IX9xgbGEAYZRiKGK8Y1Rj6GSAZRRlrGZEZtxndGgQaKhpRGncanhrFGuwbFBs7G2MbihuyG9ocAhwqHFIcexyjHMwc9R0eHUcdcB2ZHcMd7B4WHkAeah6UHr4e6R8THz4faR+UH78f6iAVIEEgbCCYIMQg8CEcIUghdSGhIc4h+yInIlUigiKvIt0jCiM4I2YjlCPCI/AkHyRNJHwkqyTaJQklOCVoJZclxyX3JicmVyaHJrcm6CcYJ0kneierJ9woDSg/KHEooijUKQYpOClrKZ0p0CoCKjUqaCqbKs8rAis2K2krnSvRLAUsOSxuLKIs1y0MLUEtdi2rLeEuFi5MLoIuty7uLyQvWi+RL8cv/jA1MGwwpDDbMRIxSjGCMbox8jIqMmMymzLUMw0zRjN/M7gz8TQrNGU0njTYNRM1TTWHNcI1/TY3NnI2rjbpNyQ3YDecN9c4FDhQOIw4yDkFOUI5fzm8Ofk6Njp0OrI67zstO2s7qjvoPCc8ZTykPOM9Ij1hPaE94D4gPmA+oD7gPyE/YT+iP+JAI0BkQKZA50EpQWpBrEHuQjBCckK1QvdDOkN9Q8BEA0RHRIpEzkUSRVVFmkXeRiJGZ0arRvBHNUd7R8BIBUhLSJFI10kdSWNJqUnwSjdKfUrESwxLU0uaS+JMKkxyTLpNAk1KTZNN3E4lTm5Ot08AT0lPk0/dUCdQcVC7UQZRUFGbUeZSMVJ8UsdTE1NfU6pT9lRCVI9U21UoVXVVwlYPVlxWqVb3V0RXklfgWC9YfVjLWRpZaVm4WgdaVlqmWvVbRVuVW+VcNVyGXNZdJ114XcleGl5sXr1fD19hX7NgBWBXYKpg/GFPYaJh9WJJYpxi8GNDY5dj62RAZJRk6WU9ZZJl52Y9ZpJm6Gc9Z5Nn6Wg/aJZo7GlDaZpp8WpIap9q92tPa6dr/2xXbK9tCG1gbbluEm5rbsRvHm94b9FwK3CGcOBxOnGVcfByS3KmcwFzXXO4dBR0cHTMdSh1hXXhdj52m3b4d1Z3s3gReG54zHkqeYl553pGeqV7BHtje8J8IXyBfOF9QX2hfgF+Yn7CfyN/hH/lgEeAqIEKgWuBzYIwgpKC9INXg7qEHYSAhOOFR4Wrhg6GcobXhzuHn4gEiGmIzokziZmJ/opkisqLMIuWi/yMY4zKjTGNmI3/jmaOzo82j56QBpBukNaRP5GokhGSepLjk02TtpQglIqU9JVflcmWNJaflwqXdZfgmEyYuJkkmZCZ/JpomtWbQpuvnByciZz3nWSd0p5Anq6fHZ+Ln/qgaaDYoUehtqImopajBqN2o+akVqTHpTilqaYapoum/adup+CoUqjEqTepqaocqo+rAqt1q+msXKzQrUStuK4trqGvFq+LsACwdbDqsWCx1rJLssKzOLOutCW0nLUTtYq2AbZ5tvC3aLfguFm40blKucK6O7q1uy67p7whvJu9Fb2Pvgq+hL7/v3q/9cBwwOzBZ8Hjwl/C28NYw9TEUcTOxUvFyMZGxsPHQce/yD3IvMk6ybnKOMq3yzbLtsw1zLXNNc21zjbOts83z7jQOdC60TzRvtI/0sHTRNPG1EnUy9VO1dHWVdbY11zX4Nhk2OjZbNnx2nba+9uA3AXcit0Q3ZbeHN6i3ynfr+A24L3hROHM4lPi2+Nj4+vkc+T85YTmDeaW5x/nqegy6LzpRunQ6lvq5etw6/vshu0R7ZzuKO6070DvzPBY8OXxcvH/8ozzGfOn9DT0wvVQ9d72bfb794r4Gfio+Tj5x/pX+uf7d/wH/Jj9Kf26/kv+3P9t//9WUDhMTAEAAC9jABoQh6AgbQOm/k3vipj/+RcIpHCDS0gDD4OHK0my2gaUDQrc/7yW2McbZ39E9N+B20iK5LkcMy39IPw9jGExjw4glQZjcjeVJmPwtrWRvJU2Vm/HQ0gPIW6PIMR0uKH9klZoVczqkAmIKYBJyG3bGbm4npELF8hdAXeJ2zVsFdRqoFUxq0MmIKYAJuGlwSWipYIlY8U01oLaK1FZC8vJ7MtaiPvpSTkvvV0m7nIpJTkXhnOmpxb8x7jfv0H00Q/x/V8xk9d1iXAT4vccwpjXPNr/4RNidUIyT0QOxqRoNE+nfOWTrOay13hiM5UrC4R5gg5hDsIahTEMWxymQCyRGELRY5GDUaMRw9HikQJSIhJCqsdUjemoBVULR4tHCkiJSOgB3BZlDICbtdmY+RDK9BC2h1Aewu5tLg9xxa3JJdFdXHarI8XwBzQCUFNBSU4AAAA4QklNA+0AAAAAABABLAAAAAEAAQEsAAAAAQABOEJJTQQoAAAAAAAMAAAAAj/wAAAAAAAAOEJJTQRDAAAAAAANUGJlVwEQAAUBAAAAAAA=\"/><p>中国国务委员兼国务院秘书长吴政隆要求，综合整治低价无序非理性竞争，加快清理拖欠企业账款。</p><p>据中新社报道，吴政隆11月13日至16日在黑龙江、辽宁调研。</p><p>他说，要深入学习贯彻中共二十届五中全会精神，认真落实党中央、国务院决策部署，牢牢把握维护“五大安全”重要使命，充分发挥存量和增量政策效能，加力扩大内需、优化供给，持续优化营商环境，增强发展动力、激发社会活力，推动经济向新向优向好发展。</p><p>吴政隆先后到齐齐哈尔、大庆、哈尔滨和铁岭、沈阳等地，深入调研石油化工、先进制造、农产品加工等企业，并与有关地方政府、企业座谈交流。他说，前三季度中国经济运行总体平稳、稳中有进，高质量发展取得新的成效。要坚定信心、抢抓机遇，上下协同推动政策落实，努力实现全年经济社会发展目标任务。</p><p>吴政隆说，要纵深推进全国统一大市场建设，挖掘需求潜力，增强“两新”“两重”政策实施效能，综合整治低价无序非理性竞争，加快清理拖欠企业账款，打造更优营商环境。要因地制宜发展新质生产力，深化拓展“人工智能+”行动，以新技术赋能传统产业改造升级，以新场景引领新兴产业和未来产业发展壮大，加快构建以先进制造业为骨干的现代化产业体系。</p><p>吴政隆强调，要巩固拓展树立和践行正确政绩观学习教育成果，更好统筹发展和安全，增强忧患意识、强化底线思维，加强普惠性、基础性、兜底性民生建设，做好岁末年初就业增收、困难群众帮扶、保供稳价、安全生产等工作，有效防范化解重点领域风险，不断增强人民群众获得感幸福感安全感。</p>"
+  },
+  "https://www.zaobao.com.sg/news/china/story20261117-10006495": {
+    "fetchedAt": "2026-11-17T03:55:34.639Z",
+    "v": 31,
+    "meta": {
+      "datetime": "2026-11-17 05:00",
+      "author": "缪宗翰"
+    },
+    "contentHtml": "<p><img src=\"https://cassette.sphdigital.com.sg/image/zaobao/d586c9c7e0d96b0ebfac9beb42462a66d328153cdd943a08132c87af4343cb6c?f=webp&amp;o=zbimg&amp;oloc=se\" alt=\"这次台北市长选战中，民进党籍候选人沈伯洋支持者自发创作的“洋流”设计进入竞选团队的正式宣传，进而衍生出飘带等应援小物热潮，把粉丝社群参与方式带进选举。图为台湾总统赖清德11月15日在沈伯洋竞选活动中发表助选演说，台下支持者挥舞旗帜、飘带。 （法新社）\"/></p><p>这次台北市长选战中，民进党籍候选人沈伯洋支持者自发创作的“洋流”设计进入竞选团队的正式宣传，进而衍生出飘带等应援小物热潮，把粉丝社群参与方式带进选举。图为台湾总统赖清德11月15日在沈伯洋竞选活动中发表助选演说，台下支持者挥舞旗帜、飘带。 （法新社）</p><p>围绕偶像或作品形成的社群参与方式被称为“饭圈文化”，标志包括共同称呼、应援物、自制内容、物品交换，以及线上线下协同行动。自称“洋流船员”的支持者设计、传播海报和飘带，之后又参与船员证登记、车扫路线认领和现场应援，互称“小水滴”等，呈现出相似的参与方式。选举宣传由此获得一套来自粉丝社群的组织和参与力量。</p><p>起初，“洋流”并非沈伯洋竞选团队设计的宣传品牌，而是源自支持者、设计师许家纶与广告业友人Ken于8月18日首次在宁夏夜市派发“洋流”海报。“洋流”一词由Ken提出，许家纶则负责视觉设计。</p>"
   }
 }
